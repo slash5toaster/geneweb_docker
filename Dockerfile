@@ -2,14 +2,16 @@ FROM debian:10
 
 ENV GW_VER=7.0.0 \
     GW_USER=geneweb \
+    GW_GROUP=geneweb \
     GW_UID=115 \
+    GW_GID=115 \
     GW_ROOT=/opt/geneweb \
     GWD_PORT=2317 \
     GWSETUP_PORT=2316
 
 # Add rsiapp user
-RUN groupadd ${GW_USER}    -g ${GW_UID}
-RUN useradd ${GW_USER}     -u ${GW_UID}    -g ${GW_USER}
+RUN groupadd ${GW_GROUP}   -g ${GW_GID}
+RUN useradd ${GW_USER}     -u ${GW_UID}    -g ${GW_GROUP}
 
 RUN pwck -s \
   ; grpck -s
