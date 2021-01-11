@@ -1,6 +1,7 @@
 FROM debian:stable-slim
 
 ENV GW_VER=7.0.0 \
+    GW_PR=88536ed4 \
     GW_USER=geneweb \
     GW_GROUP=geneweb \
     GW_UID=115 \
@@ -34,46 +35,28 @@ RUN apt-get update && \
             m4 \
             make \
             ocaml \
+            tini \
+            wget \
             unzip
 
 RUN apt-get install -y \
             opam
 
-USER ${GW_USER}
-RUN    opam init \
-    && opam switch create 4.09.0 \
-    && eval $(opam env) \
-    && opam install depext \
-    && opam install benchmark \
-                    calendars \
-                    camlp5.7.12 \
-                    cppo \
-                    dune.1.11.4 \
-                    jingoo.1.4.1 \
-                    markup \
-                    num \
-                    ounit \
-                    stdlib-shims \
-                    unidecode.0.2.0 \
-                    uucp \
-                    uunf \
-                    zarith
-
 # make geneweb
 WORKDIR /tmp/
-RUN git clone https://github.com/geneweb/geneweb \
-    && cd geneweb \
-    && git checkout tags/v${GW_VER} -b v${GW_VER} \
-    && ocaml ./configure.ml \
-             --sosa-zarith \
-    && make distrib
+
+RUN wget https://github.com/geneweb/geneweb/releases/download/v${GW_VER}/geneweb-linux-${GW_PR}.zip \
+      -O /tmp/geneweb-linux-${GW_PR}.zip \
+    && cd ${GW_ROOT} \
+    && unzip geneweb-linux-${GW_PR}.zip \
+    && chown -cR ${GW_USER}.${GW_GROUP} ${GW_ROOT}
 
 USER ${GW_USER}
 WORKDIR ${GW_ROOT}
 
 EXPOSE ${GWD_PORT} ${GWSETUP_PORT}
 
-ENTRYPOINT ["${GW_ROOT}/startup.sh"]
+# ENTRYPOINT ["${GW_ROOT}/startup.sh"]
 
 # Mandatory CBS Labels
 LABEL PROJECT=geneweb
