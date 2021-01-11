@@ -127,6 +127,8 @@ case ${ACTION} in
       # this assumes the format of the docker image command
       if [[ $( docker images | tr -s ' ' ':' | grep -c ^${CONTAINER_STRING}) ]]; then
         docker run --rm -it ${CONTAINER_STRING}
+      else
+        echo ${CONTAINER_STRING} "doesn't exist"
       fi
     ;;
   help|h)

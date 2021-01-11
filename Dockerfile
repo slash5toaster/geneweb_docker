@@ -1,4 +1,4 @@
-FROM debian:10
+FROM debian:stable
 
 ENV GW_VER=7.0.0 \
     GW_USER=geneweb \
