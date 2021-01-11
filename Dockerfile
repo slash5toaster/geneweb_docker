@@ -1,4 +1,4 @@
-FROM debian:stable
+FROM debian:stable-slim
 
 ENV GW_VER=7.0.0 \
     GW_USER=geneweb \
@@ -10,8 +10,13 @@ ENV GW_VER=7.0.0 \
     GWSETUP_PORT=2316
 
 # Add rsiapp user
-RUN groupadd ${GW_GROUP}   -g ${GW_GID}
-RUN useradd ${GW_USER}     -u ${GW_UID}    -g ${GW_GROUP}
+RUN groupadd ${GW_GROUP} \
+          -g ${GW_GID}
+RUN useradd ${GW_USER} \
+         -u ${GW_UID} \
+         -g ${GW_GROUP} \
+         -m -d ${GW_ROOT} \
+         -s /bin/bash
 
 RUN pwck -s \
   ; grpck -s
@@ -19,20 +24,22 @@ RUN pwck -s \
 # Update OS to apply latest vulnerability fix
 RUN apt-get update && \
     apt-get install -y \
-            ocaml \
-            curl \
-            make \
-            m4 \
-            unzip \
             bubblewrap \
+            build-essential \
+            curl \
             gcc \
-            libgmp-dev \
-            libcurl4-gnutls-dev \
             git \
-            build-essential
+            libcurl4-gnutls-dev \
+            libgmp-dev \
+            m4 \
+            make \
+            ocaml \
+            unzip
 
 RUN apt-get install -y \
             opam
+
+USER ${GW_USER}
 RUN    opam init \
     && opam switch create 4.09.0 \
     && eval $(opam env) \
@@ -57,7 +64,8 @@ WORKDIR /tmp/
 RUN git clone https://github.com/geneweb/geneweb \
     && cd geneweb \
     && git checkout tags/v${GW_VER} -b v${GW_VER} \
-    && ocaml ./configure.ml --sosa-zarith\
+    && ocaml ./configure.ml \
+             --sosa-zarith \
     && make distrib
 
 USER ${GW_USER}
