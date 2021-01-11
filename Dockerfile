@@ -48,7 +48,7 @@ WORKDIR /tmp/
 RUN wget https://github.com/geneweb/geneweb/releases/download/v${GW_VER}/geneweb-linux-${GW_PR}.zip \
       -O /tmp/geneweb-linux-${GW_PR}.zip \
     && cd ${GW_ROOT} \
-    && unzip geneweb-linux-${GW_PR}.zip \
+    && unzip /tmp/geneweb-linux-${GW_PR}.zip \
     && chown -cR ${GW_USER}.${GW_GROUP} ${GW_ROOT}
 
 USER ${GW_USER}

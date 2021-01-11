@@ -126,22 +126,30 @@ case ${ACTION} in
   run)
       # this assumes the format of the docker image command
       if [[ $( docker images | tr -s ' ' ':' | grep -c ^${CONTAINER_STRING}) ]]; then
-        docker run --rm -it ${CONTAINER_STRING}
+        docker run --rm -it -v $(pwd):/opt/devel ${CONTAINER_STRING}
       else
         echo ${CONTAINER_STRING} "doesn't exist"
       fi
     ;;
+  list)
+      # this assumes the format of the docker image command
+      if [[ $( docker images | tr -s ' ' ':' | grep -c ^${CONTAINER_STRING}) ]]; then
+        echo ${CONTAINER_STRING}
+      else
+        echo ${CONTAINER_STRING} "not yet built"
+      fi
+    ;;
   help|h)
-    echo "Please use $(basename $0) local|remote|singularity|all|run "
+    echo "Please use $(basename $0) local|remote|singularity|all|run|list "
     echo "   local - builds only the local container"
     echo "   remote - builds and tags the local + remote container"
     echo "   singularity - builds the singularity image from the local container"
     echo "   all - as implied"
+    echo "   run - runs the container with 'docker run --rm -it ${CONTAINER_STRING}'"
+    echo "   list - list the container to be built"
     ;;
   *)
-    echo "Please use      $(basename $0) local|remote|singularity|all|run"
-    echo
-    echo "instead of $(basename ${0}) ${ACTION}"
+    ./$(basename ${0}) help
     ;;
 esac
 
