@@ -54,7 +54,7 @@ RUN wget https://github.com/geneweb/geneweb/releases/download/v${GW_VER}/geneweb
     && rm -v /tmp/geneweb-linux-${GW_PR}.zip
 
 COPY opt/geneweb/startup.sh ${GW_ROOT}
-COPY opt/geneweb/bashrc ~${GW_USER}/.bashrc
+COPY opt/geneweb/bashrc ~${GW_ROOT}/.bashrc
 
 RUN chown -cR ${GW_USER}.${GW_GROUP} ${GW_ROOT}
 
@@ -62,6 +62,11 @@ USER ${GW_USER}
 WORKDIR ${GW_ROOT}
 
 EXPOSE ${GWD_PORT} ${GWSETUP_PORT}
+
+HEALTHCHECK --interval=5m \
+            --timeout=3s \
+            --start-period=30s \
+  CMD curl -s --fail http://localhost:2317 -o /dev/null
 
 # ENTRYPOINT ["${GW_ROOT}/startup.sh"]
 
