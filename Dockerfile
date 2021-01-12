@@ -44,11 +44,13 @@ RUN apt-get install -y \
 
 # make geneweb
 WORKDIR /tmp/
+COPY opt/geneweb/startup.sh ${GW_ROOT}
 
 RUN wget https://github.com/geneweb/geneweb/releases/download/v${GW_VER}/geneweb-linux-${GW_PR}.zip \
       -O /tmp/geneweb-linux-${GW_PR}.zip \
     && cd ${GW_ROOT} \
     && unzip /tmp/geneweb-linux-${GW_PR}.zip \
+    && mv -v ${GW_ROOT}/distribution/* ${GW_ROOT} \
     && chown -cR ${GW_USER}.${GW_GROUP} ${GW_ROOT}
 
 USER ${GW_USER}
