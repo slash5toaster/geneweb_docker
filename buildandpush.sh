@@ -3,7 +3,7 @@
 # set -x
 set -o pipefail
 
-D2S_VERSION=v3.5.1
+D2S_VERSION=v3.7.0
 declare -a LABEL_NAMES
 declare -a REMOTE_LNK
 
