@@ -35,6 +35,7 @@ RUN apt-get update && \
             m4 \
             make \
             ocaml \
+            procps \
             tini \
             wget \
             unzip
@@ -44,7 +45,6 @@ RUN apt-get install -y \
 
 # make geneweb
 WORKDIR /tmp/
-COPY opt/geneweb/startup.sh ${GW_ROOT}
 
 RUN wget https://github.com/geneweb/geneweb/releases/download/v${GW_VER}/geneweb-linux-${GW_PR}.zip \
       -O /tmp/geneweb-linux-${GW_PR}.zip \
@@ -52,6 +52,8 @@ RUN wget https://github.com/geneweb/geneweb/releases/download/v${GW_VER}/geneweb
     && unzip /tmp/geneweb-linux-${GW_PR}.zip \
     && mv -v ${GW_ROOT}/distribution/* ${GW_ROOT} \
     && chown -cR ${GW_USER}.${GW_GROUP} ${GW_ROOT}
+
+COPY opt/geneweb/startup.sh ${GW_ROOT}
 
 USER ${GW_USER}
 WORKDIR ${GW_ROOT}
