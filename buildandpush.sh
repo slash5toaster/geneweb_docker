@@ -145,7 +145,7 @@ case ${ACTION} in
     echo "   remote - builds and tags the local + remote container"
     echo "   singularity - builds the singularity image from the local container"
     echo "   all - as implied"
-    echo "   run - runs the container with 'docker run --rm -it ${CONTAINER_STRING}'"
+    echo "   run - runs the container with 'docker run --rm -it -v $(pwd):/opt/devel ${CONTAINER_STRING}'"
     echo "   list - list the container to be built"
     ;;
   *)
