@@ -54,7 +54,7 @@ RUN wget https://github.com/geneweb/geneweb/releases/download/v${GW_VER}/geneweb
     && rm -v /tmp/geneweb-linux-${GW_PR}.zip
 
 COPY opt/geneweb/startup.sh ${GW_ROOT}
-COPY opt/geneweb/bashrc ~${GW_ROOT}/.bashrc
+COPY opt/geneweb/bashrc ${GW_ROOT}/.bashrc
 
 RUN chown -cR ${GW_USER}.${GW_GROUP} ${GW_ROOT}
 
