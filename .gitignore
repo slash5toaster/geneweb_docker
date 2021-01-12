@@ -2,5 +2,6 @@
 *.sha1
 *.img
 *.simg
+.DS_Store
 source
 test
