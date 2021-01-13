@@ -44,7 +44,7 @@ setup()
   fi
 
   #test to ensure bases directory is writeable!!
-  if [[ $(touch ${GW_BASES}/.setup && echo "OK") == "OK" ]]; then
+  if [[ $(test -w ${GW_BASES}/ && echo "OK") == "OK" ]]; then
     echo ${GW_BASES} " is writeable"
   else
     echo "Geneweb database directory "${GW_BASES}" is *NOT* writeable. Cannot start"
