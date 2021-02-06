@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-# set -x
+[[ $DEBUG ]] && set -x
 set -o pipefail
 
 D2S_VERSION=v3.7.0
+
 declare -a LABEL_NAMES
 declare -a REMOTE_LNK
 

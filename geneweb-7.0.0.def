@@ -1,0 +1,102 @@
+Bootstrap: docker
+From: debian:stable-slim
+Stage: spython-base
+
+###############################################################################
+%files
+opt/geneweb/startup.sh ${GW_ROOT}
+opt/geneweb/bashrc ${GW_ROOT}/.bashrc
+
+###############################################################################
+%labels
+MAINTAINER="slash5toaster@gmail.com"
+PROJECT=geneweb
+NAME=geneweb
+VERSION=7.0.0
+
+###############################################################################
+%post
+GW_VER=7.0.0
+GW_PR=88536ed4
+GW_USER=geneweb
+GW_GROUP=geneweb
+GW_UID=115
+GW_GID=115
+GW_ROOT=/opt/geneweb
+GWD_PORT=2317
+GWSETUP_PORT=2316
+
+# Add geneweb user
+groupadd ${GW_GROUP} \
+          -g ${GW_GID}
+
+useradd ${GW_USER} \
+        -u ${GW_UID} \
+        -g ${GW_GROUP} \
+        -m -d ${GW_ROOT} \
+        -s /bin/bash
+
+pwck -s
+grpck -s
+
+# Update OS to apply latest vulnerability fix
+apt-get update && \
+apt-get install -y \
+        bubblewrap \
+        build-essential \
+        curl \
+        gcc \
+        git \
+        libcurl4-gnutls-dev \
+        libgmp-dev \
+        m4 \
+        make \
+        ocaml \
+        procps \
+        tini \
+        wget \
+        unzip
+
+apt-get install -y \
+        opam
+
+# make geneweb
+cd /tmp/
+
+wget https://github.com/geneweb/geneweb/releases/download/v${GW_VER}/geneweb-linux-${GW_PR}.zip \
+     -O /tmp/geneweb-linux-${GW_PR}.zip \
+  && cd ${GW_ROOT} \
+  && unzip /tmp/geneweb-linux-${GW_PR}.zip \
+  && mv -v ${GW_ROOT}/distribution/* ${GW_ROOT} \
+  && rm -v /tmp/geneweb-linux-${GW_PR}.zip
+
+chown -cR ${GW_USER}.${GW_GROUP} ${GW_ROOT}
+
+su -  ${GW_USER} # USER ${GW_USER}
+cd ${GW_ROOT}
+
+###############################################################################
+%environment
+export GW_VER=7.0.0
+export GW_PR=88536ed4
+export GW_USER=geneweb
+export GW_GROUP=geneweb
+export GW_UID=115
+export GW_GID=115
+export GW_ROOT=/opt/geneweb
+export GWD_PORT=2317
+export GWSETUP_PORT=2316
+
+###############################################################################
+%runscript
+cd ${GW_ROOT}
+exec /bin/bash "$@"
+
+###############################################################################
+%startscript
+cd ${GW_ROOT}
+exec /bin/bash "$@"
+
+###############################################################################
+%test
+curl -s --fail http://localhost:2317 -o /dev/null
