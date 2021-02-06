@@ -89,8 +89,14 @@ get_version()
   # test to make sure everything is copacetic
   # test -e ${GW_ROOT}/gwd && (echo "${GW_ROOT}/gwd ${GWD_OPTS}" | tr -s '[[:blank:]]')
   # test -e ${GW_ROOT}/gwsetup && (echo "${GW_ROOT}/gwsetup ${GWS_OPTS}" | tr -s '[[:blank:]]')
-  test -e ${GW_ROOT}/gwd && echo "${GW_ROOT}/gwd ${GWD_OPTS}"
-  test -e ${GW_ROOT}/gwsetup && echo "${GW_ROOT}/gwsetup ${GWS_OPTS}"
+  if [[ -e ${GW_ROOT}/gwd && -e ${GW_ROOT}/gwsetup ]]; then
+        echo "Will start with: "
+        echo
+        echo " ${GW_ROOT}/gwd ${GWD_OPTS}"
+        echo " ${GW_ROOT}/gwsetup ${GWS_OPTS}"
+        echo
+        echo "To change parameters, export GWD_OPTS and GWS_OPTS"
+  fi
 
 }
 #=============================================================================
@@ -106,7 +112,7 @@ elif [[ $1 == "restart" ]]; then
   stop  || exit 2
   setup || exit 44
   start || exit 2
-elif [[ $1 == "version" ]]; then
+elif [[ $1 == "help" ]]; then
   get_version
 else
   "$@"
