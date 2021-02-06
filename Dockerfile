@@ -70,7 +70,7 @@ HEALTHCHECK --interval=5m \
 
 ENTRYPOINT ["${GW_ROOT}/startup.sh"]
 
-# Mandatory CBS Labels
+# Mandatory Labels
 LABEL PROJECT=geneweb
 LABEL MAINTAINER="slash5toaster@gmail.com"
 LABEL NAME=geneweb
