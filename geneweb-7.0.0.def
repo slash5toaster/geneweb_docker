@@ -100,4 +100,4 @@ exec /bin/bash "$@"
 ###############################################################################
 %test
 # curl -s --fail http://localhost:2317 -o /dev/null
-/opt/geneweb/startup.sh  version
+/opt/geneweb/startup.sh help
