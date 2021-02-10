@@ -61,7 +61,10 @@ build_local ()
   mkdir -vp source/logs/
   delay_time "Build locally -"
   mkdir -vp  source/logs/
-  docker build . -t ${CONTAINER_STRING} | tee source/logs/build-${CONTAINER_PROJECT}-${CONTAINER_NAME}_${CONTAINER_TAG}-$(date +%F-%H%M).log && \
+  docker build . \
+         -t ${CONTAINER_STRING} \
+         --label BUILDDATE=$(date +%F-%H%M) \
+    | tee source/logs/build-${CONTAINER_PROJECT}-${CONTAINER_NAME}_${CONTAINER_TAG}-$(date +%F-%H%M).log && \
   docker inspect ${CONTAINER_STRING} > source/logs/inspect-${CONTAINER_PROJECT}-${CONTAINER_NAME}_${CONTAINER_TAG}-$(date +%F-%H%M).log
 }
 

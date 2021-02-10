@@ -68,7 +68,7 @@ HEALTHCHECK --interval=5m \
             --start-period=30s \
   CMD curl -s --fail http://localhost:2317 -o /dev/null
 
-ENTRYPOINT ["${GW_ROOT}/startup.sh"]
+# ENTRYPOINT ["/usr/bin/tini", "--", ${GW_ROOT}"/startup.sh" ]
 
 # Mandatory Labels
 LABEL PROJECT=geneweb

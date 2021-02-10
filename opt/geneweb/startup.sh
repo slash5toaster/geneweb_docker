@@ -84,7 +84,7 @@ stop()
 }
 
 #=============================================================================
-get_version()
+get_help()
 {
   # test to make sure everything is copacetic
   # test -e ${GW_ROOT}/gwd && (echo "${GW_ROOT}/gwd ${GWD_OPTS}" | tr -s '[[:blank:]]')
@@ -106,14 +106,21 @@ get_version()
 if [[ ${#@} -eq 0 ]]; then
   setup || exit 44
   start || exit 2
+
 elif [[ $1 == "stop" ]]; then
   stop  || exit 2
+
 elif [[ $1 == "restart" ]]; then
   stop  || exit 2
   setup || exit 44
   start || exit 2
+
+elif [[ $1 == "bash" ]]; then
+  /usr/bin/env bash
+
 elif [[ $1 == "help" ]]; then
-  get_version
+  get_help
+
 else
   "$@"
 fi
