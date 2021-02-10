@@ -72,7 +72,7 @@ wget https://github.com/geneweb/geneweb/releases/download/v${GW_VER}/geneweb-lin
 
 chown -cR ${GW_USER}.${GW_GROUP} ${GW_ROOT}
 
-su -  ${GW_USER} # USER ${GW_USER}
+su -  ${GW_USER}
 cd ${GW_ROOT}
 
 ###############################################################################
