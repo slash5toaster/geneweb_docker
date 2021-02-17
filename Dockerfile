@@ -1,6 +1,7 @@
 FROM debian:stable-slim
 
 ENV GW_VER=7.0.0 \
+    GW_PR=88536ed4 \
     GW_USER=geneweb \
     GW_GROUP=geneweb \
     GW_UID=115 \
@@ -34,6 +35,9 @@ RUN apt-get update && \
             m4 \
             make \
             ocaml \
+            procps \
+            tini \
+            wget \
             unzip
 
 RUN apt-get install -y \
@@ -73,9 +77,15 @@ WORKDIR ${GW_ROOT}
 
 EXPOSE ${GWD_PORT} ${GWSETUP_PORT}
 
-ENTRYPOINT ["${GW_ROOT}/startup.sh"]
+HEALTHCHECK --interval=5m \
+            --timeout=3s \
+            --start-period=30s \
+  CMD curl -s --fail http://localhost:2317 -o /dev/null
 
-# Mandatory CBS Labels
+ENTRYPOINT [ "/usr/bin/tini", "--" ]
+CMD [ "/opt/geneweb/startup.sh start" ]
+
+# Mandatory Labels
 LABEL PROJECT=geneweb
 LABEL MAINTAINER="slash5toaster@gmail.com"
 LABEL NAME=geneweb
