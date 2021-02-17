@@ -82,7 +82,24 @@ stop()
   pkill -e gwsetup || echo "gwsetup not running"
 
 }
+#=============================================================================
+status()
+{
+  cd ${GW_ROOT}
 
+  if [[ $(pgrep gwd) ]]; then
+    echo "gwd running as $(pgrep -a gwd)"
+  else
+    echo "gwd not running"
+  fi
+
+  # gwsetup
+  if [[ $(pgrep gwsetup) ]]; then
+    echo "gwsetup running as $(pgrep -a setup)"
+  else
+    echo "gwsetup not running"
+  fi
+}
 #=============================================================================
 get_help()
 {
@@ -90,6 +107,7 @@ get_help()
   # test -e ${GW_ROOT}/gwd && (echo "${GW_ROOT}/gwd ${GWD_OPTS}" | tr -s '[[:blank:]]')
   # test -e ${GW_ROOT}/gwsetup && (echo "${GW_ROOT}/gwsetup ${GWS_OPTS}" | tr -s '[[:blank:]]')
   if [[ -e ${GW_ROOT}/gwd && -e ${GW_ROOT}/gwsetup ]]; then
+        echo "parameters start|stop|restart|status|help "
         echo "Will start with: "
         echo
         echo " ${GW_ROOT}/gwd ${GWD_OPTS}"
@@ -114,6 +132,9 @@ elif [[ $1 == "restart" ]]; then
   stop  || exit 2
   setup || exit 44
   start || exit 2
+
+elif [[ $1 == "restart" ]]; then
+  status
 
 elif [[ $1 == "bash" ]]; then
   /usr/bin/env bash
