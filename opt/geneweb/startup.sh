@@ -87,6 +87,7 @@ status()
 {
   cd ${GW_ROOT}
 
+  echo "---------"
   if [[ $(pgrep gwd) ]]; then
     echo "gwd running as $(pgrep -a gwd)"
   else
@@ -95,7 +96,7 @@ status()
 
   # gwsetup
   if [[ $(pgrep gwsetup) ]]; then
-    echo "gwsetup running as $(pgrep -a setup)"
+    echo "gwsetup running: $(pgrep -a setup)"
   else
     echo "gwsetup not running"
   fi
@@ -124,16 +125,19 @@ get_help()
 if [[ ${#@} -eq 0 ]]; then
   setup || exit 44
   start || exit 2
+  status
 
 elif [[ $1 == "stop" ]]; then
   stop  || exit 2
+  status
 
 elif [[ $1 == "restart" ]]; then
   stop  || exit 2
   setup || exit 44
   start || exit 2
+  status
 
-elif [[ $1 == "restart" ]]; then
+elif [[ $1 == "status" ]]; then
   status
 
 elif [[ $1 == "bash" ]]; then
