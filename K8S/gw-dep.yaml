@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: geneweb-dep
+  labels:
+    app: geneweb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: geneweb
+  template:
+    metadata:
+      labels:
+        app: geneweb
+# containers
+    spec:
+      containers:
+      - name: geneweb
+        image: localhost:5000/geneweb/geneweb:7.0.0-pb
+        imagePullPolicy: Never
+        volumeMounts:
+          - name: geneweb-storage
+            mountPath: /opt/geneweb/bases/
+        ports:
+          - containerPort: 2317
+            name: gwd
+          - containerPort: 2316
+            name: gwsetup
+# volumes
+      volumes:
+      - name: geneweb-storage
+        emptyDir: {}
