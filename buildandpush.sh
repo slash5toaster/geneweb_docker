@@ -16,7 +16,7 @@ LABEL_NAMES=(
              GENERATE_SINGULARITY_IMAGE
              )
 REMOTE_LNK=(
-            nada.roche.com:5000
+            localhost:5000
             )
 
 ACTION=${1:-"nothing"}
