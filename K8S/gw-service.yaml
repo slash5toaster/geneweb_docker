@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: geneweb-dep
+  labels:
+    app: geneweb
+spec:
+  selector:
+    app: geneweb
+  type: LoadBalancer
+  ports:
+    - name: gwd
+      protocol: TCP
+      port: 2317
+      targetPort: 2317
+    - name: gwsetup
+      protocol: TCP
+      port: 2316
+      targetPort: 2316
