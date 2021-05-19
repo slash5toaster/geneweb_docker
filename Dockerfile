@@ -56,7 +56,8 @@ RUN wget https://github.com/geneweb/geneweb/releases/download/v${GW_VER}/geneweb
 COPY opt/geneweb/startup.sh ${GW_ROOT}
 COPY opt/geneweb/bashrc ${GW_ROOT}/.bashrc
 
-RUN chown -cR ${GW_USER}.${GW_GROUP} ${GW_ROOT}
+RUN chown -cR ${GW_USER}.${GW_GROUP} ${GW_ROOT} \
+    && chmod -c +x /opt/geneweb/startup.sh
 
 USER ${GW_USER}
 WORKDIR ${GW_ROOT}
@@ -69,7 +70,7 @@ HEALTHCHECK --interval=5m \
   CMD curl -s --fail http://localhost:2317 -o /dev/null
 
 ENTRYPOINT [ "/usr/bin/tini", "--" ]
-CMD [ "/opt/geneweb/startup.sh start" ]
+CMD [ "sh", "-c", "/opt/geneweb/startup.sh", "$@" ]
 
 # Mandatory Labels
 LABEL PROJECT=geneweb

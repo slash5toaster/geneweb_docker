@@ -130,7 +130,11 @@ case ${ACTION} in
   run)
       # this assumes the format of the docker image command
       if [[ $( docker images | tr -s ' ' ':' | grep -c ^${CONTAINER_STRING}) ]]; then
-        docker run --rm -it -v $(pwd):/opt/devel ${CONTAINER_STRING} bash
+        docker run --rm \
+                   -it \
+                   -e DEBUG=0 \
+                   -v $(pwd):/opt/devel \
+                   ${CONTAINER_STRING} bash
       else
         echo ${CONTAINER_STRING} "doesn't exist"
       fi

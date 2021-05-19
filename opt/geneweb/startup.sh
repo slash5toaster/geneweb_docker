@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+[[ $DEBUG ]] && set -x
+
 # Run Geneweb
 GW_ACTION=${1:-"start"}
 GW_LANG=${GW_LANG:="en"}
@@ -14,13 +16,13 @@ GWSETUP_PORT=${GWSETUP_PORT:="2316"}
 GWD_OPTS=${GWD_OPTS:=" -lang ${GW_LANG} \
                        -log ${GW_LOGDIR}/gwd.log \
                        -p $GWD_PORT \
-                       -bd ${GW_BASES} \
-                       -daemon"}
+                       -bd ${GW_BASES}
+                       "}
 GWS_OPTS=${GWS_OPTS:=" -lang ${GW_LANG} \
                        -bd ${GW_BASES} \
                        -only ${GW_BASES}/only.txt \
-                       -p $GWSETUP_PORT \
-                       -daemon"}
+                       -p $GWSETUP_PORT
+                       "}
 #make clean
 GWD_OPTS=$(echo ${GWD_OPTS} | tr -s '[[:blank:]]')
 GWS_OPTS=$(echo ${GWS_OPTS} | tr -s '[[:blank:]]')
@@ -63,15 +65,14 @@ start()
   else
     echo "Starting Geneweb"
     test -e ${GW_LOGDIR}/gwd.log && mv ${GW_LOGDIR}/gwd.log.old
-    #start with tini
-    tini -s ${GW_ROOT}/gwd -- ${GWD_OPTS}
+    ${GW_ROOT}/gwd ${GWD_OPTS}
   fi
 
   # gwsetup
   if [[ $(pgrep gwsetup) ]]; then
       echo "gwsetup running as $(pgrep -a setup)"
   else
-    tini -s ${GW_ROOT}/gwsetup -- ${GWS_OPTS}
+    ${GW_ROOT}/gwsetup ${GWS_OPTS}
   fi
 }
 #=============================================================================
@@ -105,8 +106,7 @@ status()
 get_help()
 {
   # test to make sure everything is copacetic
-  # test -e ${GW_ROOT}/gwd && (echo "${GW_ROOT}/gwd ${GWD_OPTS}" | tr -s '[[:blank:]]')
-  # test -e ${GW_ROOT}/gwsetup && (echo "${GW_ROOT}/gwsetup ${GWS_OPTS}" | tr -s '[[:blank:]]')
+
   if [[ -e ${GW_ROOT}/gwd && -e ${GW_ROOT}/gwsetup ]]; then
         echo "parameters start|stop|restart|status|help "
         echo "Will start with: "
