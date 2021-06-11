@@ -3,7 +3,7 @@
 [[ $DEBUG ]] && set -x
 set -o pipefail
 
-D2S_VERSION=v3.7.0
+D2S_VERSION=v3.7.4
 
 declare -a LABEL_NAMES
 declare -a REMOTE_LNK
