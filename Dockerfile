@@ -1,12 +1,12 @@
 FROM debian:stable-slim
 
-ENV GW_VER=7.0.0 \
+ARG GW_VER=7.0.0 \
     GW_PR=88536ed4 \
     GW_USER=geneweb \
     GW_GROUP=geneweb \
     GW_UID=115 \
-    GW_GID=115 \
-    GW_ROOT=/opt/geneweb \
+    GW_GID=115 
+ENV GW_ROOT=/opt/geneweb \
     GWD_PORT=2317 \
     GWSETUP_PORT=2316
 
