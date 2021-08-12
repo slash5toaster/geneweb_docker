@@ -132,8 +132,11 @@ case ${ACTION} in
       if [[ $( docker images | tr -s ' ' ':' | grep -c ^${CONTAINER_STRING}) ]]; then
         docker run --rm \
                    -it \
+                   -p 2316:2316 \
+                   -p 2317:2317 \
                    -e DEBUG=0 \
                    -v $(pwd):/opt/devel \
+                   -v $(pwd)/bases/:/opt/geneweb/bases/ \
                    ${CONTAINER_STRING} bash
       else
         echo ${CONTAINER_STRING} "doesn't exist"
@@ -153,7 +156,7 @@ case ${ACTION} in
     echo "   remote - builds and tags the local + remote container"
     echo "   singularity - builds the singularity image from the local container"
     echo "   all - as implied"
-    echo "   run - runs the container with 'docker run --rm -it -v $(pwd):/opt/devel ${CONTAINER_STRING}'"
+    echo "   run - runs the container with 'docker run --rm -it -p 2316:2316 -p 2317:2317 -e DEBUG=0 -v $(pwd):/opt/devel -v $(pwd)/bases/:/opt/geneweb/bases/ ${CONTAINER_STRING} bash'"
     echo "   list - list the container to be built"
     ;;
   *)
