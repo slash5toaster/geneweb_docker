@@ -68,12 +68,15 @@ start()
 
     tini ${GW_ROOT}/gwd -- ${GWD_OPTS}
   fi
+}
 
+launch_setup()
+{
   # gwsetup
   if [[ $(pgrep gwsetup) ]]; then
       echo "gwsetup running as $(pgrep -a setup)"
   else
-    ${GW_ROOT}/gwsetup ${GWS_OPTS} &
+    tini ${GW_ROOT}/gwsetup -- ${GWS_OPTS}
   fi
 }
 #=============================================================================
@@ -109,7 +112,7 @@ get_help()
   # test to make sure everything is copacetic
 
   if [[ -e ${GW_ROOT}/gwd && -e ${GW_ROOT}/gwsetup ]]; then
-        echo "parameters start|stop|restart|status|help "
+        echo "parameters start|setup|stop|restart|status|help "
         echo "Will start with: "
         echo
         echo " ${GW_ROOT}/gwd ${GWD_OPTS}"
@@ -130,6 +133,12 @@ if [[ ${#@} -eq 0 ]]; then
 
 elif [[ $1 == "stop" ]]; then
   stop  || exit 2
+  status
+
+elif [[ $1 == "setup" ]]; then
+  stop  || exit 2
+  setup || exit 44
+  launch_setup || exit 2
   status
 
 elif [[ $1 == "restart" ]]; then
