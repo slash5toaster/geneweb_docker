@@ -17,6 +17,7 @@ LABEL_NAMES=(
              )
 REMOTE_LNK=(
             localhost:5000
+            s5t.jfrog.io/default-docker-virtual
             )
 
 ACTION=${1:-"nothing"}
@@ -74,12 +75,12 @@ push_remote ()
   for (( i = 0; i < ${#REMOTE_LNK[@]}; i++ ));
   do
     # ensure the remote is up before attempting to tag and push
-    if [[ $(wget -q --tries=2 --timeout=2 --spider ${REMOTE_LNK[${i}]} && echo "there") == "there" ]]; then
+    # if [[ $(wget -q --tries=2 --timeout=2 --spider ${REMOTE_LNK[${i}]} && echo "there") == "there" ]]; then
       docker tag ${CONTAINER_STRING} ${REMOTE_LNK[${i}]}/${CONTAINER_STRING}
       docker push ${REMOTE_LNK[i]}/${CONTAINER_STRING}
-    else
-      echo "${REMOTE_LNK[${i}]} not responding"
-    fi
+    # else
+    #   echo "${REMOTE_LNK[${i}]} not responding"
+    # fi
   done
 }
 
