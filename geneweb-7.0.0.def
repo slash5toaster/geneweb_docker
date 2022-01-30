@@ -3,9 +3,7 @@ From: debian:stable-slim
 Stage: spython-base
 
 ###############################################################################
-%files
-opt/geneweb/startup.sh ${GW_ROOT}
-opt/geneweb/bashrc ${GW_ROOT}/.bashrc
+# %files
 
 ###############################################################################
 %labels
@@ -43,36 +41,51 @@ grpck -s
 apt-get update && \
 apt-get install -y \
         bubblewrap \
-        build-essential \
-        curl \
-        gcc \
         git \
         libcurl4-gnutls-dev \
         libgmp-dev \
+        libipc-system-simple-perl \
+        libstring-shellquote-perl \
         m4 \
-        make \
-        ocaml \
-        procps \
-        tini \
-        wget \
-        unzip
-
-apt-get install -y \
-        opam
+        opam \
+        vim
 
 # make geneweb
-cd /tmp/
+opam init -c 4.12.1
 
-wget https://github.com/geneweb/geneweb/releases/download/v${GW_VER}/geneweb-linux-${GW_PR}.zip \
-     -O /tmp/geneweb-linux-${GW_PR}.zip \
-  && cd ${GW_ROOT} \
-  && unzip /tmp/geneweb-linux-${GW_PR}.zip \
-  && mv -v ${GW_ROOT}/distribution/* ${GW_ROOT} \
-  && rm -v /tmp/geneweb-linux-${GW_PR}.zip
+eval $(opam env)
+
+opam install -y \
+     calendars \
+     camlp5 \
+     cppo \
+     dune \
+     jingoo \
+     markup \
+     ppx_blob \
+     ppx_deriving \
+     ppx_import \
+     stdlib-shims \
+     syslog \
+     unidecode.0.2.0 \
+     uucp \
+     uutf \
+     uunf
+
+cd /tmp/
+git clone \
+    --depth=1 \
+    --no-single-branch \
+    https://github.com/geneweb/geneweb
+cd geneweb/
+git checkout v7.0.0
+
+ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release
+make distrib
 
 chown -cR ${GW_USER}.${GW_GROUP} ${GW_ROOT}
 
-su -  ${GW_USER}
+su - ${GW_USER}
 cd ${GW_ROOT}
 
 ###############################################################################
@@ -90,14 +103,14 @@ export GWSETUP_PORT=2316
 ###############################################################################
 %runscript
 cd ${GW_ROOT}
-/opt/geneweb/startup.sh "$@"
+#/opt/geneweb/startup.sh "$@"
 
 ###############################################################################
 %startscript
 cd ${GW_ROOT}
-/opt/geneweb/startup.sh "$@"
+/opt/geneweb/gwd -help
 
 ###############################################################################
 %test
 # curl -s --fail http://localhost:2317 -o /dev/null
-/opt/geneweb/startup.sh help
+# /opt/geneweb/startup.sh help
