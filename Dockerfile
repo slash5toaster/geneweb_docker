@@ -10,7 +10,7 @@ ENV GW_ROOT=/opt/geneweb \
     GWD_PORT=2317 \
     GWSETUP_PORT=2316
 
-# Add rsiapp user
+# Add geneweb user
 RUN groupadd ${GW_GROUP} \
           -g ${GW_GID}
 RUN useradd ${GW_USER} \
