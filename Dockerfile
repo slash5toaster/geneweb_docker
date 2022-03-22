@@ -1,16 +1,18 @@
-FROM debian:stable-slim
+FROM debian:unstable-slim
 
-ENV GW_VER=7.0.0 \
+ARG GW_VER=7.0.0 \
     GW_PR=88536ed4 \
     GW_USER=geneweb \
     GW_GROUP=geneweb \
     GW_UID=115 \
-    GW_GID=115 \
-    GW_ROOT=/opt/geneweb \
+    GW_GID=115
+ENV GW_ROOT=/opt/geneweb \
     GWD_PORT=2317 \
-    GWSETUP_PORT=2316
+    GWSETUP_PORT=2316 \
+    HTTP_PORT=80 \
+    HTTPS_PORT=443
 
-# Add rsiapp user
+# Add geneweb user
 RUN groupadd ${GW_GROUP} \
           -g ${GW_GID}
 RUN useradd ${GW_USER} \
@@ -37,8 +39,8 @@ RUN apt-get update && \
             ocaml \
             procps \
             tini \
-            wget \
-            unzip
+            unzip \
+            wget
 
 RUN apt-get install -y \
             opam
@@ -75,7 +77,10 @@ RUN git clone https://github.com/geneweb/geneweb \
 USER ${GW_USER}
 WORKDIR ${GW_ROOT}
 
-EXPOSE ${GWD_PORT} ${GWSETUP_PORT}
+EXPOSE ${GWD_PORT} \
+       ${GWSETUP_PORT} \
+       ${HTTP_PORT} \
+       ${HTTPS_PORT}
 
 HEALTHCHECK --interval=5m \
             --timeout=3s \

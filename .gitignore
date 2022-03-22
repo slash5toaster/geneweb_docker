@@ -1,7 +1,8 @@
-*.sif
-*.sha1
-*.img
-*.simg
 .DS_Store
+*.img
+*.sha1
+*.sif
+*.simg
+bases/
 source
 test
