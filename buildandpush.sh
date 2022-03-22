@@ -3,7 +3,7 @@
 [[ $DEBUG ]] && set -x
 set -o pipefail
 
-D2S_VERSION=v3.8.3
+D2S_VERSION=v3.9.2
 
 declare -a LABEL_NAMES
 declare -a REMOTE_LNK
@@ -17,7 +17,6 @@ LABEL_NAMES=(
              )
 REMOTE_LNK=(
             localhost:5000
-            s5t.jfrog.io/default-docker-virtual
             )
 
 ACTION=${1:-"nothing"}
