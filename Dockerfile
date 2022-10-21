@@ -1,7 +1,7 @@
 FROM debian:unstable-slim
 
 ARG GW_VER=7.0.0 \
-    GW_PR=88536ed4 \
+    GW_PR=48a588f8 \
     GW_USER=geneweb \
     GW_GROUP=geneweb \
     GW_UID=115 \
