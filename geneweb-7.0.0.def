@@ -15,7 +15,7 @@ VERSION=7.0.0
 ###############################################################################
 %post
 GW_VER=7.0.0
-GW_PR=88536ed4
+GW_PR=48a588f8
 GW_USER=geneweb
 GW_GROUP=geneweb
 GW_UID=115
@@ -78,7 +78,7 @@ git clone \
     --no-single-branch \
     https://github.com/geneweb/geneweb
 cd geneweb/
-git checkout v7.0.0
+git checkout Geneweb-$GW_PR
 
 ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release
 make distrib
@@ -91,7 +91,7 @@ cd ${GW_ROOT}
 ###############################################################################
 %environment
 export GW_VER=7.0.0
-export GW_PR=88536ed4
+export GW_PR=48a588f8
 export GW_USER=geneweb
 export GW_GROUP=geneweb
 export GW_UID=115
