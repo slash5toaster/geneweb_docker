@@ -69,7 +69,7 @@ RUN    opam init \
 WORKDIR /tmp/
 RUN git clone https://github.com/geneweb/geneweb \
     && cd geneweb \
-    && git checkout tags/v${GW_VER} -b v${GW_VER} \
+    && git checkout tags/Geneweb-${GW_PR} \
     && ocaml ./configure.ml \
              --sosa-zarith \
     && make distrib
