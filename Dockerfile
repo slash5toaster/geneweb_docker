@@ -46,7 +46,8 @@ RUN apt-get install -y \
 # make geneweb
 WORKDIR /tmp/
 
-RUN wget https://github.com/geneweb/geneweb/releases/download/v${GW_VER}/geneweb-linux-${GW_PR}.zip \
+#        https://github.com/geneweb/geneweb/releases/download/Geneweb-48a588f8/geneweb-linux-48a588f8.zip
+RUN wget https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/geneweb-linux-${GW_PR}.zip \
       -O /tmp/geneweb-linux-${GW_PR}.zip \
     && cd ${GW_ROOT} \
     && unzip /tmp/geneweb-linux-${GW_PR}.zip \
