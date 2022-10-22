@@ -17,7 +17,6 @@ LABEL_NAMES=(
              )
 REMOTE_LNK=(
             localhost:5000
-            s5t.jfrog.io/default-docker-virtual
             )
 
 ACTION=${1:-"nothing"}

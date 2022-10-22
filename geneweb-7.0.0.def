@@ -17,7 +17,7 @@ VERSION=7.0.0
 ###############################################################################
 %post
 GW_VER=7.0.0
-GW_PR=88536ed4
+GW_PR=48a588f8
 GW_USER=geneweb
 GW_GROUP=geneweb
 GW_UID=115
@@ -63,7 +63,8 @@ apt-get install -y \
 # make geneweb
 cd /tmp/
 
-wget https://github.com/geneweb/geneweb/releases/download/v${GW_VER}/geneweb-linux-${GW_PR}.zip \
+#    https://github.com/geneweb/geneweb/releases/download/Geneweb-48a588f8/geneweb-linux-48a588f8.zip
+wget https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/geneweb-linux-${GW_PR}.zip \
      -O /tmp/geneweb-linux-${GW_PR}.zip \
   && cd ${GW_ROOT} \
   && unzip /tmp/geneweb-linux-${GW_PR}.zip \
