@@ -1,9 +1,9 @@
-SHELL := /usr/local/bin/bash
+SHELL := /usr/bin/env bash
 
 # Docker repository for tagging and publishing
 DOCKER_REPO ?= localhost
 D2S_VERSION ?= v3.9.4
-EXPOSED_PORT ?= 9050
+EXPOSED_PORT ?= 2317
 
 # Date for log files
 LOGDATE := $(shell date +%F-%H%M)
@@ -17,6 +17,15 @@ CONTAINER_STRING ?= $(CONTAINER_PROJECT)/$(CONTAINER_NAME):$(CONTAINER_TAG)
 C_ID = $(shell ${GET_ID})
 C_STATUS = $(shell ${GET_STATUS})
 C_IMAGES = $(shell ${GET_IMAGES})
+
+define run_hadolint
+	@echo ''
+	@echo '> Dockerfile$(1) ==========='
+	docker run --rm -i \
+	-e HADOLINT_FAILURE_THRESHOLD=error \
+	-e HADOLINT_IGNORE=DL3042,DL3008,DL3015,DL3048 \
+	hadolint/hadolint < Dockerfile$(1)
+endef
 
 # HELP
 # https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
@@ -32,6 +41,7 @@ envs: ## show the environments
 
 local: ## Build the image locally.
 	mkdir -vp source/logs/ ; \
+	DOCKER_BUILDKIT=1 \
 	docker build . \
 			--cache-from $(CONTAINER_STRING) \
 			-t $(CONTAINER_STRING) \
@@ -64,6 +74,7 @@ run: ## run the image
 		--rm \
 		--detach \
 		-e TZ=PST8PDT \
+		--entrypoint=/bin/bash \
 		--name $(CONTAINER_NAME) \
 		--hostname=$(CONTAINER_NAME)-$(CONTAINER_TAG) \
 		--publish $(EXPOSED_PORT):$(EXPOSED_PORT) \
@@ -86,6 +97,9 @@ kill: ## shutdown
 publish: ## Push server image to remote
 	@echo 'pushing server-$(VERSION) to $(DOCKER_REPO)'
 	docker push $(CONTAINER_STRING)
+
+docker-lint: ## Check files for errors
+	$(call run_hadolint)
 
 # Commands for extracting information on the running container
 GET_IMAGES := docker images ${CONTAINER_STRING} --format "{{.ID}}"

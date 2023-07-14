@@ -135,8 +135,9 @@ case ${ACTION} in
                    -p 2316:2316 \
                    -p 2317:2317 \
                    -e DEBUG=0 \
-                   -v $(pwd):/opt/devel \
-                   -v $(pwd)/bases/:/opt/geneweb/bases/ \
+                   --hostname ${CONTAINER_NAME}-${CONTAINER_TAG} \
+                   -v "$(pwd)":/opt/devel \
+                   -v "$(pwd)/bases/":/opt/geneweb/bases/ \
                    ${CONTAINER_STRING} bash
       else
         echo ${CONTAINER_STRING} "doesn't exist"

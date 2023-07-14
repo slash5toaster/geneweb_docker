@@ -20,48 +20,55 @@ RUN useradd ${GW_USER} \
          -g ${GW_GROUP} \
          -m -d ${GW_ROOT} \
          --system \
+         -l \
          -s /bin/bash
 
 RUN pwck -s \
   ; grpck -s
 
 # Update OS to apply latest vulnerability fix
-RUN apt-get update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
     apt-get install -y \
             bubblewrap \
-            build-essential \
             curl \
             gcc \
             git \
             libcurl4-gnutls-dev \
             libgmp-dev \
-            m4 \
-            make \
             ocaml \
             procps \
             tini \
             unzip \
             wget
 
-RUN apt-get install -y \
-            opam
+# for netskope clients locally
+COPY usr/local/share/ca-certificates/netskoperoot.crt /usr/local/share/ca-certificates/netskoperoot.crt
+RUN /usr/sbin/update-ca-certificates
 
 # make geneweb
 WORKDIR /tmp/
 
-#        https://github.com/geneweb/geneweb/releases/download/Geneweb-48a588f8/geneweb-linux-48a588f8.zip
-RUN wget https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/geneweb-linux-${GW_PR}.zip \
-      -O /tmp/geneweb-linux-${GW_PR}.zip \
-    && cd ${GW_ROOT} \
-    && unzip /tmp/geneweb-linux-${GW_PR}.zip \
-    && mv -v ${GW_ROOT}/distribution/* ${GW_ROOT} \
-    && rm -v /tmp/geneweb-linux-${GW_PR}.zip
+# https://github.com/geneweb/geneweb/releases/download/Geneweb-48a588f8/geneweb-linux-48a588f8.zip
+# https://github.com/geneweb/geneweb/releases/download/Geneweb-1eaac340/geneweb-linux-1eaac340.zip
+RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
+    cd /tmp/build/ \
+    && ls /tmp/build/ \
+    && wget --progress=dot:giga \
+            -c \
+            https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/geneweb-linux-${GW_PR}.zip \
+            -O /tmp/build/geneweb-linux-${GW_PR}.zip \
+    && mkdir -vp "${GW_ROOT}" \
+    && unzip /tmp/build/geneweb-linux-${GW_PR}.zip -d "${GW_ROOT}" \
+    && mv -v "${GW_ROOT}/distribution/*" "${GW_ROOT}"\
+    ; env | sort
 
 COPY opt/geneweb/startup.sh ${GW_ROOT}
 COPY opt/geneweb/bashrc ${GW_ROOT}/.bashrc
 
-RUN chown -cR ${GW_USER}.${GW_GROUP} ${GW_ROOT} \
-    && chmod -c +x /opt/geneweb/startup.sh
+RUN chown -cR ${GW_USER}:${GW_GROUP} ${GW_ROOT} \
+ && chmod -c +x /opt/geneweb/startup.sh
 
 USER ${GW_USER}
 WORKDIR ${GW_ROOT}
