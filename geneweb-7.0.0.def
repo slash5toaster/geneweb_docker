@@ -79,7 +79,7 @@ cd ${GW_ROOT}
 ###############################################################################
 %environment
 export GW_VER=7.0.0
-export GW_PR=88536ed4
+export GW_PR=48a588f8
 export GW_USER=geneweb
 export GW_GROUP=geneweb
 export GW_UID=115

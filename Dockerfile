@@ -1,14 +1,16 @@
 FROM debian:unstable-slim
 
 ARG GW_VER=7.0.0 \
-    GW_PR=48a588f8 \
+    GW_PR=1eaac340 \
     GW_USER=geneweb \
     GW_GROUP=geneweb \
     GW_UID=115 \
     GW_GID=115
 ENV GW_ROOT=/opt/geneweb \
     GWD_PORT=2317 \
-    GWSETUP_PORT=2316
+    GWSETUP_PORT=2316 \
+    HTTP_PORT=80 \
+    HTTPS_PORT=443
 
 # Add geneweb user
 RUN groupadd ${GW_GROUP} \
@@ -17,6 +19,7 @@ RUN useradd ${GW_USER} \
          -u ${GW_UID} \
          -g ${GW_GROUP} \
          -m -d ${GW_ROOT} \
+         --system \
          -s /bin/bash
 
 RUN pwck -s \
@@ -37,8 +40,8 @@ RUN apt-get update && \
             ocaml \
             procps \
             tini \
-            wget \
-            unzip
+            unzip \
+            wget
 
 RUN apt-get install -y \
             opam
@@ -63,7 +66,10 @@ RUN chown -cR ${GW_USER}.${GW_GROUP} ${GW_ROOT} \
 USER ${GW_USER}
 WORKDIR ${GW_ROOT}
 
-EXPOSE ${GWD_PORT} ${GWSETUP_PORT}
+EXPOSE ${GWD_PORT} \
+       ${GWSETUP_PORT} \
+       ${HTTP_PORT} \
+       ${HTTPS_PORT}
 
 HEALTHCHECK --interval=5m \
             --timeout=3s \
