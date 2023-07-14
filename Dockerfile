@@ -6,7 +6,7 @@ ARG GW_VER=7.0.0 \
     GW_GROUP=geneweb \
     GW_UID=115 \
     GW_GID=115
-ENV GW_ROOT=/opt/geneweb \
+ENV GW_ROOT=/usr/local/geneweb \
     GWD_PORT=2317 \
     GWSETUP_PORT=2316 \
     HTTP_PORT=80 \
@@ -59,16 +59,15 @@ RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
             -c \
             https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/geneweb-linux-${GW_PR}.zip \
             -O /tmp/build/geneweb-linux-${GW_PR}.zip \
-    && mkdir -vp "${GW_ROOT}" \
-    && unzip /tmp/build/geneweb-linux-${GW_PR}.zip -d "${GW_ROOT}" \
-    && mv -v "${GW_ROOT}/distribution/*" "${GW_ROOT}"\
-    ; env | sort
+    && unzip /tmp/build/geneweb-linux-${GW_PR}.zip -d "/tmp/build/geneweb" \
+    && mkdir -vp ${GW_ROOT} \
+    && mv -v /tmp/build/geneweb/distribution/* ${GW_ROOT}/
 
 COPY opt/geneweb/startup.sh ${GW_ROOT}
 COPY opt/geneweb/bashrc ${GW_ROOT}/.bashrc
 
 RUN chown -cR ${GW_USER}:${GW_GROUP} ${GW_ROOT} \
- && chmod -c +x /opt/geneweb/startup.sh
+ && chmod -c +x ${GW_ROOT}/startup.sh
 
 USER ${GW_USER}
 WORKDIR ${GW_ROOT}

@@ -135,6 +135,7 @@ case ${ACTION} in
                    -p 2316:2316 \
                    -p 2317:2317 \
                    -e DEBUG=0 \
+                   --user root:root \
                    --hostname ${CONTAINER_NAME}-${CONTAINER_TAG} \
                    -v "$(pwd)":/opt/devel \
                    -v "$(pwd)/bases/":/opt/geneweb/bases/ \
