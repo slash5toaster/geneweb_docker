@@ -1,7 +1,7 @@
 FROM debian:unstable-slim
 
 ARG GW_VER=7.0.0 \
-    GW_PR=48a588f8 \
+    GW_PR=1eaac340 \
     GW_USER=geneweb \
     GW_GROUP=geneweb \
     GW_UID=115 \
@@ -19,6 +19,7 @@ RUN useradd ${GW_USER} \
          -u ${GW_UID} \
          -g ${GW_GROUP} \
          -m -d ${GW_ROOT} \
+         --system \
          -s /bin/bash
 
 RUN pwck -s \
