@@ -3,7 +3,8 @@ SHELL := /usr/bin/env bash
 # Docker repository for tagging and publishing
 DOCKER_REPO ?= localhost
 D2S_VERSION ?= v3.9.4
-EXPOSED_PORT ?= 2317
+GW_PORT ?= 2317
+GWC_PORT ?= 2316
 GW_ROOT ?= /opt/geneweb
 
 # Date for log files
@@ -46,6 +47,8 @@ local: ## Build the image locally.
 	docker build . \
 			--cache-from $(CONTAINER_STRING) \
 			--build-arg GW_ROOT=$(GW_ROOT) \
+			--build-arg GW_PORT=$(GW_PORT) \
+			--build-arg GWC_PORT=$(GWC_PORT) \
 			-t $(CONTAINER_STRING) \
 			--progress plain \
 			--label BUILDDATE=$(LOGDATE) 2>&1 \
@@ -75,15 +78,14 @@ run: ## run the image
 	docker run \
 		--rm \
 		--detach \
-		-p 2316:2316 \
-		-p 2317:2317 \
 		-e TZ=PST8PDT \
 		-v "$(shell pwd)":/opt/devel \
 		-v "$(shell pwd)/bases/":$(GW_ROOT)/bases/ \
 		--name $(CONTAINER_NAME) \
 		--hostname=$(CONTAINER_NAME)-$(CONTAINER_TAG) \
-		--publish $(EXPOSED_PORT):$(EXPOSED_PORT) \
-			$(CONTAINER_STRING)
+		--publish $(GW_PORT):$(GW_PORT) \
+		--publish $(GWC_PORT):$(GWC_PORT) \
+		$(CONTAINER_STRING)
 
 shell: run ## shell in server image.
 	[ "${C_ID}" ] || \
