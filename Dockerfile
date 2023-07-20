@@ -6,7 +6,7 @@ ARG GW_VER=7.0.0 \
     GW_GROUP=geneweb \
     GW_UID=115 \
     GW_GID=115
-ENV GW_ROOT=/usr/local/geneweb \
+ENV GW_ROOT=/opt/geneweb \
     GWD_PORT=2317 \
     GWSETUP_PORT=2316 \
     HTTP_PORT=80 \
@@ -31,12 +31,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && \
     apt-get install -y \
-            bubblewrap \
             curl \
             gcc \
             git \
-            libcurl4-gnutls-dev \
-            libgmp-dev \
             ocaml \
             procps \
             tini \
@@ -60,7 +57,7 @@ RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
             https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/geneweb-linux-${GW_PR}.zip \
             -O /tmp/build/geneweb-linux-${GW_PR}.zip \
     && unzip /tmp/build/geneweb-linux-${GW_PR}.zip -d "/tmp/build/geneweb" \
-    && mkdir -vp ${GW_ROOT} \
+    && mkdir -vp ${GW_ROOT} ${GW_ROOT}/logs \
     && mv -v /tmp/build/geneweb/distribution/* ${GW_ROOT}/
 
 COPY opt/geneweb/startup.sh ${GW_ROOT}
