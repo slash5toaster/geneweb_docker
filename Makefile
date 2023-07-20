@@ -78,8 +78,8 @@ run: ## run the image
 		-p 2316:2316 \
 		-p 2317:2317 \
 		-e TZ=PST8PDT \
-		-v "$(pwd)":/opt/devel \
-		-v "$(pwd)/bases/":$(GW_ROOT)/bases/ \
+		-v "$(shell pwd)":/opt/devel \
+		-v "$(shell pwd)/bases/":$(GW_ROOT)/bases/ \
 		--name $(CONTAINER_NAME) \
 		--hostname=$(CONTAINER_NAME)-$(CONTAINER_TAG) \
 		--publish $(EXPOSED_PORT):$(EXPOSED_PORT) \
