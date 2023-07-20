@@ -4,6 +4,7 @@ SHELL := /usr/bin/env bash
 DOCKER_REPO ?= localhost
 D2S_VERSION ?= v3.9.4
 EXPOSED_PORT ?= 2317
+GW_ROOT ?= /opt/geneweb
 
 # Date for log files
 LOGDATE := $(shell date +%F-%H%M)
@@ -44,6 +45,7 @@ local: ## Build the image locally.
 	DOCKER_BUILDKIT=1 \
 	docker build . \
 			--cache-from $(CONTAINER_STRING) \
+			--build-arg GW_ROOT=$(GW_ROOT) \
 			-t $(CONTAINER_STRING) \
 			--progress plain \
 			--label BUILDDATE=$(LOGDATE) 2>&1 \
@@ -73,8 +75,11 @@ run: ## run the image
 	docker run \
 		--rm \
 		--detach \
+		-p 2316:2316 \
+		-p 2317:2317 \
 		-e TZ=PST8PDT \
-		--entrypoint=/bin/bash \
+		-v "$(pwd)":/opt/devel \
+		-v "$(pwd)/bases/":/opt/geneweb/bases/ \
 		--name $(CONTAINER_NAME) \
 		--hostname=$(CONTAINER_NAME)-$(CONTAINER_TAG) \
 		--publish $(EXPOSED_PORT):$(EXPOSED_PORT) \
@@ -87,6 +92,7 @@ shell: run ## shell in server image.
 		-it \
 		-e DEBUG=0 \
 		-e TZ=PST8PDT \
+		--user root:root \
 		$(CONTAINER_NAME) /bin/sh
 
 kill: ## shutdown
