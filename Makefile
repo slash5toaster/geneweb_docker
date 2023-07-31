@@ -6,6 +6,7 @@ D2S_VERSION ?= v3.9.4
 GW_PORT ?= 2317
 GWC_PORT ?= 2316
 GW_ROOT ?= /opt/geneweb
+GW_PR ?= bc1a18d
 
 # Date for log files
 LOGDATE := $(shell date +%F-%H%M)
@@ -49,6 +50,7 @@ local: ## Build the image locally.
 			--build-arg GW_ROOT=$(GW_ROOT) \
 			--build-arg GW_PORT=$(GW_PORT) \
 			--build-arg GWC_PORT=$(GWC_PORT) \
+			--build-arg GW_PR=$(GW_PR) \
 			-t $(CONTAINER_STRING) \
 			--progress plain \
 			--label BUILDDATE=$(LOGDATE) 2>&1 \
@@ -95,7 +97,7 @@ shell: run ## shell in server image.
 		-e DEBUG=0 \
 		-e TZ=PST8PDT \
 		--user root:root \
-		$(CONTAINER_NAME) /bin/sh
+		$(CONTAINER_NAME) /bin/bash
 
 kill: ## shutdown
 	[ "${C_ID}" ] || \
