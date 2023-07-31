@@ -83,7 +83,7 @@ ENTRYPOINT [ "/usr/bin/tini", "--" ]
 CMD [ "sh", "-c", "/opt/geneweb/startup.sh", "$@" ]
 
 # Mandatory Labels
-LABEL PROJECT=geneweb
+LABEL PROJECT=slash5toaster
 LABEL MAINTAINER="slash5toaster@gmail.com"
 LABEL NAME=geneweb
 LABEL VERSION=7.0.0-pb
