@@ -6,7 +6,7 @@ D2S_VERSION ?= v3.9.4
 GW_PORT ?= 2317
 GWC_PORT ?= 2316
 GW_ROOT ?= /opt/geneweb
-GW_PR ?= bc1a18d
+GW_PR ?= 1eaac340
 
 # Date for log files
 LOGDATE := $(shell date +%F-%H%M)
