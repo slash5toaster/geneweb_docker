@@ -101,8 +101,8 @@ shell: run ## shell in server image.
 
 kill: ## shutdown
 	[ "${C_ID}" ] || \
-	docker kill $(C_ID) && \
-	docker rm $(C_ID)
+	docker kill $(CONTAINER_NAME) && \
+	docker rm $(CONTAINER_NAME)
 
 publish: ## Push server image to remote
 	@echo 'pushing server-$(VERSION) to $(DOCKER_REPO)'
