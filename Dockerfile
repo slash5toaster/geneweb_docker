@@ -20,13 +20,16 @@ RUN useradd ${GW_USER} \
          -g ${GW_GROUP} \
          -m -d ${GW_ROOT} \
          --system \
+         -l \
          -s /bin/bash
 
 RUN pwck -s \
   ; grpck -s
 
 # Update OS to apply latest vulnerability fix
-RUN apt-get update && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
     apt-get install -y \
             bubblewrap \
             build-essential \
@@ -43,28 +46,9 @@ RUN apt-get update && \
             unzip \
             wget
 
-RUN apt-get install -y \
-            opam
-
-USER ${GW_USER}
-RUN    opam init \
-    && opam switch create 4.09.0 \
-    && eval $(opam env) \
-    && opam install depext \
-    && opam install benchmark \
-                    calendars \
-                    camlp5.7.12 \
-                    cppo \
-                    dune.1.11.4 \
-                    jingoo.1.4.1 \
-                    markup \
-                    num \
-                    ounit \
-                    stdlib-shims \
-                    unidecode.0.2.0 \
-                    uucp \
-                    uunf \
-                    zarith
+# for netskope clients locally
+COPY usr/local/share/ca-certificates/netskoperoot.crt /usr/local/share/ca-certificates/netskoperoot.crt
+RUN /usr/sbin/update-ca-certificates
 
 # make geneweb
 WORKDIR /tmp/
@@ -89,10 +73,10 @@ HEALTHCHECK --interval=5m \
   CMD curl -s --fail http://localhost:2317 -o /dev/null
 
 ENTRYPOINT [ "/usr/bin/tini", "--" ]
-CMD [ "/opt/geneweb/startup.sh start" ]
+CMD [ "sh", "-c", "/opt/geneweb/startup.sh", "$@" ]
 
 # Mandatory Labels
-LABEL PROJECT=geneweb
+LABEL PROJECT=slash5toaster
 LABEL MAINTAINER="slash5toaster@gmail.com"
 LABEL NAME=geneweb
 LABEL VERSION=7.0.0

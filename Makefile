@@ -1,9 +1,12 @@
-SHELL := /usr/local/bin/bash
+SHELL := /usr/bin/env bash
 
 # Docker repository for tagging and publishing
 DOCKER_REPO ?= localhost
 D2S_VERSION ?= v3.9.4
-EXPOSED_PORT ?= 9050
+GW_PORT ?= 2317
+GWC_PORT ?= 2316
+GW_ROOT ?= /opt/geneweb
+GW_PR ?= 1eaac340
 
 # Date for log files
 LOGDATE := $(shell date +%F-%H%M)
@@ -17,6 +20,15 @@ CONTAINER_STRING ?= $(CONTAINER_PROJECT)/$(CONTAINER_NAME):$(CONTAINER_TAG)
 C_ID = $(shell ${GET_ID})
 C_STATUS = $(shell ${GET_STATUS})
 C_IMAGES = $(shell ${GET_IMAGES})
+
+define run_hadolint
+	@echo ''
+	@echo '> Dockerfile$(1) ==========='
+	docker run --rm -i \
+	-e HADOLINT_FAILURE_THRESHOLD=error \
+	-e HADOLINT_IGNORE=DL3042,DL3008,DL3015,DL3048 \
+	hadolint/hadolint < Dockerfile$(1)
+endef
 
 # HELP
 # https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
@@ -32,8 +44,13 @@ envs: ## show the environments
 
 local: ## Build the image locally.
 	mkdir -vp source/logs/ ; \
+	DOCKER_BUILDKIT=1 \
 	docker build . \
 			--cache-from $(CONTAINER_STRING) \
+			--build-arg GW_ROOT=$(GW_ROOT) \
+			--build-arg GW_PORT=$(GW_PORT) \
+			--build-arg GWC_PORT=$(GWC_PORT) \
+			--build-arg GW_PR=$(GW_PR) \
 			-t $(CONTAINER_STRING) \
 			--progress plain \
 			--label BUILDDATE=$(LOGDATE) 2>&1 \
@@ -64,10 +81,13 @@ run: ## run the image
 		--rm \
 		--detach \
 		-e TZ=PST8PDT \
+		-v "$(shell pwd)":/opt/devel \
+		-v "$(shell pwd)/bases/":$(GW_ROOT)/bases/ \
 		--name $(CONTAINER_NAME) \
 		--hostname=$(CONTAINER_NAME)-$(CONTAINER_TAG) \
-		--publish $(EXPOSED_PORT):$(EXPOSED_PORT) \
-			$(CONTAINER_STRING)
+		--publish $(GW_PORT):$(GW_PORT) \
+		--publish $(GWC_PORT):$(GWC_PORT) \
+		$(CONTAINER_STRING)
 
 shell: run ## shell in server image.
 	[ "${C_ID}" ] || \
@@ -76,16 +96,20 @@ shell: run ## shell in server image.
 		-it \
 		-e DEBUG=0 \
 		-e TZ=PST8PDT \
-		$(CONTAINER_NAME) /bin/sh
+		--user root:root \
+		$(CONTAINER_NAME) /bin/bash
 
 kill: ## shutdown
 	[ "${C_ID}" ] || \
-	docker kill $(C_ID) && \
-	docker rm $(C_ID)
+	docker kill $(CONTAINER_NAME) && \
+	docker rm $(CONTAINER_NAME)
 
 publish: ## Push server image to remote
 	@echo 'pushing server-$(VERSION) to $(DOCKER_REPO)'
 	docker push $(CONTAINER_STRING)
+
+docker-lint: ## Check files for errors
+	$(call run_hadolint)
 
 # Commands for extracting information on the running container
 GET_IMAGES := docker images ${CONTAINER_STRING} --format "{{.ID}}"

@@ -3,7 +3,7 @@
 [[ $DEBUG ]] && set -x
 
 # Run Geneweb
-GW_ACTION=${1:-"start"}
+# GW_ACTION=${1:-"start"}
 GW_LANG=${GW_LANG:="en"}
 GW_ROOT=${GW_ROOT:="/opt/geneweb"}
 GW_BASES=${GW_BASES:="${GW_ROOT}/bases/"}

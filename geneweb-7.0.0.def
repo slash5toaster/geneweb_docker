@@ -3,7 +3,9 @@ From: debian:stable-slim
 Stage: spython-base
 
 ###############################################################################
-# %files
+%files
+opt/geneweb/startup.sh ${GW_ROOT}
+opt/geneweb/bashrc ${GW_ROOT}/.bashrc
 
 ###############################################################################
 %labels
@@ -41,6 +43,9 @@ grpck -s
 apt-get update && \
 apt-get install -y \
         bubblewrap \
+        build-essential \
+        curl \
+        gcc \
         git \
         libcurl4-gnutls-dev \
         libgmp-dev \
