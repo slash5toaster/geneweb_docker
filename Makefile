@@ -2,19 +2,18 @@ SHELL := /usr/bin/env bash
 
 # Docker repository for tagging and publishing
 DOCKER_REPO ?= localhost
-D2S_VERSION ?= v3.9.4
 GW_PORT ?= 2317
 GWC_PORT ?= 2316
 GW_ROOT ?= /opt/geneweb
-GW_PR ?= 1eaac340
+GW_PR ?= 88536ed
 
 # Date for log files
 LOGDATE := $(shell date +%F-%H%M)
 
 # pull the name from the docker file - these labels *MUST* be set
-CONTAINER_PROJECT ?= $(shell grep LABEL Dockerfile | grep -i project | cut -d = -f2 | tr -d '"')
-CONTAINER_NAME ?= $(shell grep LABEL Dockerfile | grep -i name | cut -d = -f2 | tr -d '"')
-CONTAINER_TAG ?= $(shell grep LABEL Dockerfile | grep -i version | cut -d = -f2| tr -d '"')
+CONTAINER_PROJECT ?= $(shell grep org.opencontainers.image.vendor Dockerfile | cut -d = -f2 |  tr -d '"\\ ')
+CONTAINER_NAME ?= $(shell grep org.opencontainers.image.ref.name Dockerfile  | cut -d = -f2 |  tr -d '"\\ ')
+CONTAINER_TAG ?= $(shell grep org.opencontainers.image.version Dockerfile    | cut -d = -f2 |  tr -d '"\\ ')
 CONTAINER_STRING ?= $(CONTAINER_PROJECT)/$(CONTAINER_NAME):$(CONTAINER_TAG)
 
 C_ID = $(shell ${GET_ID})
@@ -42,37 +41,50 @@ help: ## This help.
 envs: ## show the environments
 	$(shell echo -e "${CONTAINER_STRING}\n\t${CONTAINER_PROJECT}\n\t${CONTAINER_NAME}\n\t${CONTAINER_TAG}")
 
-local: ## Build the image locally.
+docker: ## Build the docker image locally.
+	$(call run_hadolint)
+	git pull --recurse-submodules;\
 	mkdir -vp source/logs/ ; \
 	DOCKER_BUILDKIT=1 \
 	docker build . \
-			--cache-from $(CONTAINER_STRING) \
-			--build-arg GW_ROOT=$(GW_ROOT) \
-			--build-arg GW_PORT=$(GW_PORT) \
-			--build-arg GWC_PORT=$(GWC_PORT) \
-			--build-arg GW_PR=$(GW_PR) \
-			-t $(CONTAINER_STRING) \
-			--progress plain \
-			--label BUILDDATE=$(LOGDATE) 2>&1 \
+		-t $(CONTAINER_STRING) \
+		--cache-from $(CONTAINER_STRING) \
+		--build-arg GW_ROOT=$(GW_ROOT) \
+		--build-arg GW_PORT=$(GW_PORT) \
+		--build-arg GWC_PORT=$(GWC_PORT) \
+		--build-arg GW_PR=$(GW_PR) \
+		--progress plain \
+		--label BUILDDATE=$(LOGDATE) 2>&1 \
 	| tee source/logs/build-$(CONTAINER_PROJECT)-$(CONTAINER_NAME)_$(CONTAINER_TAG)-$(LOGDATE).log ;\
 	docker inspect $(CONTAINER_STRING) > source/logs/inspect-$(CONTAINER_PROJECT)-$(CONTAINER_NAME)_$(CONTAINER_TAG)-$(LOGDATE).log
+
+setup-multi: ## setup docker multiplatform
+	docker buildx create --name buildx-multi-arch ; docker buildx use buildx-multi-arch
+
+docker-multi: ## Multi-platform build.
+	make setup-multi
+	$(call run_hadolint)
+	mkdir -vp  source/logs/ ; \
+	docker buildx build --platform linux/amd64,linux/arm64/v8 . \
+                -t $(CONTAINER_STRING) \
+		--build-arg GW_ROOT=$(GW_ROOT) \
+		--build-arg GW_PORT=$(GW_PORT) \
+                --build-arg GWC_PORT=$(GWC_PORT) \
+                --build-arg GW_PR=$(GW_PR) \
+		--label org.opencontainers.image.created=$(LOGDATE) \
+		--cache-from $(CONTAINER_STRING) \
+		--progress plain \
+		--push
 
 destroy: ## obliterate the local image
 	[ "${C_IMAGES}" == "" ] || \
          docker rmi $(CONTAINER_STRING)
 
-remote: ## Push the image to remote.
-	$(MAKE) local
+apptainer: ## Build an apptainer sif image directly
+	apptainer build \
+            --build-arg CALIBRE_VERSION=$(CALIBRE_VERSION) \
+            /tmp/$(CONTAINER_NAME)_$(CALIBRE_VERSION).sif calibre.def
 
-singularity: local ## Create a singularity version.
-	docker run \
-			-v /var/run/docker.sock:/var/run/docker.sock \
-			-v $(shell pwd)/source:/output \
-			--privileged \
-			-t \
-			--rm \
-			quay.io/singularity/docker2singularity:$(D2S_VERSION) \
-			$(CONTAINER_STRING)
 run: ## run the image
 	[ "${C_IMAGES}" ] || \
 		make local
@@ -105,7 +117,9 @@ kill: ## shutdown
 	docker rm $(CONTAINER_NAME)
 
 publish: ## Push server image to remote
-	@echo 'pushing server-$(VERSION) to $(DOCKER_REPO)'
+	[ "${C_IMAGES}" ] || \
+		make local
+	@echo 'pushing $(CONTAINER_STRING) to $(DOCKER_REPO)'
 	docker push $(CONTAINER_STRING)
 
 docker-lint: ## Check files for errors
