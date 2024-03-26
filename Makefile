@@ -44,7 +44,7 @@ envs: ## show the environments
 docker: ## Build the docker image locally.
 	$(call run_hadolint)
 	git pull --recurse-submodules;\
-	mkdir -vp source/logs/ ; \
+	mkdir -vp source/logs/; \
 	DOCKER_BUILDKIT=1 \
 	docker build . \
 		-t $(CONTAINER_STRING) \

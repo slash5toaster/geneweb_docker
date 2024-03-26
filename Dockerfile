@@ -72,11 +72,9 @@ ENTRYPOINT [ "/usr/bin/tini", "--" ]
 CMD [ "sh", "-c", "/opt/geneweb/startup.sh", "$@" ]
 
 # Mandatory Labels
-LABEL PROJECT=slash5toaster
-LABEL MAINTAINER="slash5toaster@gmail.com"
-LABEL NAME=geneweb
-LABEL VERSION=7.0.0
-LABEL GENERATE_SINGULARITY_IMAGE=true
-LABEL PRODUCTION=false
+LABEL org.opencontainers.image.vendor=slash5toaster \
+      org.opencontainers.image.authors="slash5toaster@gmail.com" \
+      org.opencontainers.image.ref.name=geneweb \
+      org.opencontainers.image.version=7.0.0
 
 #### End of File, if this is missing the file has been truncated
