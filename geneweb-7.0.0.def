@@ -17,7 +17,7 @@ VERSION=7.0.0
 ###############################################################################
 %post
 GW_VER=7.0.0
-GW_PR=48a588f8
+GW_PR=88536ed
 GW_USER=geneweb
 GW_GROUP=geneweb
 GW_UID=115

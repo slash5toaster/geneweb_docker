@@ -1,7 +1,7 @@
 FROM debian:unstable-slim
 
 ARG GW_VER=7.0.0 \
-    GW_PR=1eaac340 \
+    GW_PR=88536ed \
     GW_USER=geneweb \
     GW_GROUP=geneweb \
     GW_UID=115 \
@@ -45,10 +45,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
             tini \
             unzip \
             wget
-
-# for netskope clients locally
-COPY usr/local/share/ca-certificates/netskoperoot.crt /usr/local/share/ca-certificates/netskoperoot.crt
-RUN /usr/sbin/update-ca-certificates
 
 # make geneweb
 WORKDIR /tmp/
