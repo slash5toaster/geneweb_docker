@@ -17,7 +17,7 @@ VERSION=7.0.0
 ###############################################################################
 %post
 GW_VER=7.0.0
-GW_PR=48a588f8
+GW_PR=88536ed
 GW_USER=geneweb
 GW_GROUP=geneweb
 GW_UID=115
@@ -73,7 +73,7 @@ wget https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/genew
 
 chown -cR ${GW_USER}.${GW_GROUP} ${GW_ROOT}
 
-su -  ${GW_USER}
+su - ${GW_USER}
 cd ${GW_ROOT}
 
 ###############################################################################
@@ -91,14 +91,14 @@ export GWSETUP_PORT=2316
 ###############################################################################
 %runscript
 cd ${GW_ROOT}
-/opt/geneweb/startup.sh "$@"
+#/opt/geneweb/startup.sh "$@"
 
 ###############################################################################
 %startscript
 cd ${GW_ROOT}
-/opt/geneweb/startup.sh "$@"
+/opt/geneweb/gwd -help
 
 ###############################################################################
 %test
 # curl -s --fail http://localhost:2317 -o /dev/null
-/opt/geneweb/startup.sh help
+# /opt/geneweb/startup.sh help
