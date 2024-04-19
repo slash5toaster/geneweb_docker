@@ -6,7 +6,7 @@ GW_PORT ?= 2317
 GWC_PORT ?= 2316
 GW_ROOT ?= /opt/geneweb
 GW_PR ?= 2ab85d8 
-GW_VER ?= 7.1-beta
+GW_VER ?= v7.1-beta
 
 # Date for log files
 LOGDATE := $(shell date +%F-%H%M)
@@ -54,6 +54,7 @@ docker: ## Build the docker image locally.
 		--build-arg GW_PORT=$(GW_PORT) \
 		--build-arg GWC_PORT=$(GWC_PORT) \
 		--build-arg GW_PR=$(GW_PR) \
+		--build-arg GW_VER=$(GW_VER) \
 		--progress plain \
 		--label BUILDDATE=$(LOGDATE) 2>&1 \
 	| tee source/logs/build-$(CONTAINER_PROJECT)-$(CONTAINER_NAME)_$(CONTAINER_TAG)-$(LOGDATE).log ;\

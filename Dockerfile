@@ -42,17 +42,16 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # make geneweb
 WORKDIR /tmp/
 
-# https://github.com/geneweb/geneweb/releases/download/Geneweb-48a588f8/geneweb-linux-48a588f8.zip
 # https://github.com/geneweb/geneweb/releases/download/Geneweb-1eaac340/geneweb-linux-1eaac340.zip
+# https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/geneweb-linux-${GW_PR}.zip \
 RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
     cd /tmp/build/ \
     && ls /tmp/build/ \
     && wget --progress=dot:giga \
             -c \
-#            https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/geneweb-linux-${GW_PR}.zip \
-             https://github.com/geneweb/geneweb/releases/download/v7.1-beta/geneweb-linux.zip \
-            -O /tmp/build/geneweb-linux-${GW_PR}.zip \
-    && unzip /tmp/build/geneweb-linux-${GW_PR}.zip -d "/tmp/build/geneweb" \
+             https://github.com/geneweb/geneweb/releases/download/${GW_VER}/geneweb-linux.zip \
+            -O /tmp/build/geneweb-linux-${GW_VER}.zip \
+    && unzip /tmp/build/geneweb-linux-${GW_VER}.zip -d "/tmp/build/geneweb" \
     && mkdir -vp ${GW_ROOT} ${GW_ROOT}/logs \
     && mv -v /tmp/build/geneweb/distribution/* ${GW_ROOT}/
 
