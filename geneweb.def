@@ -1,5 +1,5 @@
 Bootstrap: docker
-From: debian:stable-slim
+From: debian:unstable-slim
 Stage: spython-base
 
 ###############################################################################
@@ -12,12 +12,12 @@ opt/geneweb/bashrc ${GW_ROOT}/.bashrc
 MAINTAINER="slash5toaster@gmail.com"
 PROJECT=geneweb
 NAME=geneweb
-VERSION=7.0.0
+VERSION=7.1.0
 
 ###############################################################################
 %post
-GW_VER=7.0.0
-GW_PR=88536ed
+GW_VER=${GW_VER}
+GW_PR=${GW_PR}
 GW_USER=geneweb
 GW_GROUP=geneweb
 GW_UID=115
@@ -64,12 +64,13 @@ apt-get install -y \
 cd /tmp/
 
 #    https://github.com/geneweb/geneweb/releases/download/Geneweb-48a588f8/geneweb-linux-48a588f8.zip
-wget https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/geneweb-linux-${GW_PR}.zip \
-     -O /tmp/geneweb-linux-${GW_PR}.zip \
+# https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/geneweb-linux-${GW_PR}.zip \
+wget https://github.com/geneweb/geneweb/releases/download/${GW_VER}/geneweb-linux.zip \
+     -O /tmp/geneweb-linux-${GW_VER}.zip \
   && cd ${GW_ROOT} \
-  && unzip /tmp/geneweb-linux-${GW_PR}.zip \
+  && unzip /tmp/geneweb-linux-${GW_VER}.zip \
   && mv -v ${GW_ROOT}/distribution/* ${GW_ROOT} \
-  && rm -v /tmp/geneweb-linux-${GW_PR}.zip
+  && rm -v /tmp/geneweb-linux-${GW_VER}.zip
 
 chown -cR ${GW_USER}.${GW_GROUP} ${GW_ROOT}
 
@@ -78,8 +79,8 @@ cd ${GW_ROOT}
 
 ###############################################################################
 %environment
-export GW_VER=7.0.0
-export GW_PR=48a588f8
+export GW_VER=${GW_VER}
+export GW_PR=${GW_PR}
 export GW_USER=geneweb
 export GW_GROUP=geneweb
 export GW_UID=115

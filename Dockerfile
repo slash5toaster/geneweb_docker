@@ -1,6 +1,6 @@
 FROM debian:unstable-slim
 
-ARG GW_VER=7.0.0 \
+ARG GW_VER=7.1.0 \
     GW_PR=88536ed \
     GW_USER=geneweb \
     GW_GROUP=geneweb \
@@ -49,7 +49,8 @@ RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
     && ls /tmp/build/ \
     && wget --progress=dot:giga \
             -c \
-            https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/geneweb-linux-${GW_PR}.zip \
+#            https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/geneweb-linux-${GW_PR}.zip \
+             https://github.com/geneweb/geneweb/releases/download/v7.1-beta/geneweb-linux.zip \
             -O /tmp/build/geneweb-linux-${GW_PR}.zip \
     && unzip /tmp/build/geneweb-linux-${GW_PR}.zip -d "/tmp/build/geneweb" \
     && mkdir -vp ${GW_ROOT} ${GW_ROOT}/logs \
@@ -81,6 +82,6 @@ CMD [ "sh", "-c", "/opt/geneweb/startup.sh", "$@" ]
 LABEL org.opencontainers.image.vendor=slash5toaster \
       org.opencontainers.image.authors="slash5toaster@gmail.com" \
       org.opencontainers.image.ref.name=geneweb \
-      org.opencontainers.image.version=7.0.0
+      org.opencontainers.image.version=7.1.0
 
 #### End of File, if this is missing the file has been truncated

@@ -5,7 +5,8 @@ DOCKER_REPO ?= localhost
 GW_PORT ?= 2317
 GWC_PORT ?= 2316
 GW_ROOT ?= /opt/geneweb
-GW_PR ?= 88536ed
+GW_PR ?= 2ab85d8 
+GW_VER ?= 7.1-beta
 
 # Date for log files
 LOGDATE := $(shell date +%F-%H%M)
@@ -82,8 +83,9 @@ destroy: ## obliterate the local image
 
 apptainer: ## Build an apptainer sif image directly
 	apptainer build \
-            --build-arg CALIBRE_VERSION=$(CALIBRE_VERSION) \
-            /tmp/$(CONTAINER_NAME)_$(CALIBRE_VERSION).sif calibre.def
+                --build-arg GW_PR=$(GW_PR) \
+                --build-arg GW_VER=$(GW_VER) \
+            /tmp/$(CONTAINER_NAME)_$(GW_VER).sif geneweb.def
 
 run: ## run the image
 	[ "${C_IMAGES}" ] || \
