@@ -1,7 +1,7 @@
 FROM debian:unstable-slim
 
-ARG GW_VER=7.1.0 \
-    GW_PR=88536ed \
+ARG GW_VER \
+    GW_PR \
     GW_USER=geneweb \
     GW_GROUP=geneweb \
     GW_UID=115 \
@@ -35,6 +35,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
             git \
             ocaml \
             procps \
+            rsync \
             tini \
             unzip \
             wget
@@ -45,15 +46,14 @@ WORKDIR /tmp/
 # https://github.com/geneweb/geneweb/releases/download/Geneweb-1eaac340/geneweb-linux-1eaac340.zip
 # https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/geneweb-linux-${GW_PR}.zip \
 RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
-    cd /tmp/build/ \
+       cd /tmp/build/ \
     && ls /tmp/build/ \
     && wget --progress=dot:giga \
-            -c \
-             https://github.com/geneweb/geneweb/releases/download/${GW_VER}/geneweb-linux.zip \
+            -c https://github.com/geneweb/geneweb/releases/download/${GW_VER}/geneweb-linux.zip \
             -O /tmp/build/geneweb-linux-${GW_VER}.zip \
     && unzip /tmp/build/geneweb-linux-${GW_VER}.zip -d "/tmp/build/geneweb" \
     && mkdir -vp ${GW_ROOT} ${GW_ROOT}/logs \
-    && mv -v /tmp/build/geneweb/distribution/* ${GW_ROOT}/
+    && mv -v /tmp/build/geneweb/* ${GW_ROOT}/
 
 COPY opt/geneweb/startup.sh ${GW_ROOT}
 COPY opt/geneweb/bashrc ${GW_ROOT}/.bashrc
@@ -81,6 +81,6 @@ CMD [ "sh", "-c", "/opt/geneweb/startup.sh", "$@" ]
 LABEL org.opencontainers.image.vendor=slash5toaster \
       org.opencontainers.image.authors="slash5toaster@gmail.com" \
       org.opencontainers.image.ref.name=geneweb \
-      org.opencontainers.image.version=7.1.0
+      org.opencontainers.image.version=${GW_VER}
 
 #### End of File, if this is missing the file has been truncated
