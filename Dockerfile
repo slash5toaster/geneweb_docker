@@ -1,7 +1,7 @@
 FROM debian:unstable-slim
 
-ARG GW_VER=7.0.0 \
-    GW_PR=88536ed \
+ARG GW_VER \
+    GW_PR \
     GW_USER=geneweb \
     GW_GROUP=geneweb \
     GW_UID=115 \
@@ -42,6 +42,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
             make \
             ocaml \
             procps \
+            rsync \
             tini \
             unzip \
             wget
@@ -75,6 +76,6 @@ CMD [ "sh", "-c", "/opt/geneweb/startup.sh", "$@" ]
 LABEL org.opencontainers.image.vendor=slash5toaster \
       org.opencontainers.image.authors="slash5toaster@gmail.com" \
       org.opencontainers.image.ref.name=geneweb \
-      org.opencontainers.image.version=7.0.0
+      org.opencontainers.image.version=7.1.0-beta
 
 #### End of File, if this is missing the file has been truncated

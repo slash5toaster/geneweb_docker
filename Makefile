@@ -5,7 +5,8 @@ DOCKER_REPO ?= localhost
 GW_PORT ?= 2317
 GWC_PORT ?= 2316
 GW_ROOT ?= /opt/geneweb
-GW_PR ?= 88536ed
+GW_PR ?= 2ab85d8 
+GW_VER ?= v7.1-beta
 
 # Date for log files
 LOGDATE := $(shell date +%F-%H%M)
@@ -53,8 +54,9 @@ docker: ## Build the docker image locally.
 		--build-arg GW_PORT=$(GW_PORT) \
 		--build-arg GWC_PORT=$(GWC_PORT) \
 		--build-arg GW_PR=$(GW_PR) \
+		--build-arg GW_VER=$(GW_VER) \
 		--progress plain \
-		--label BUILDDATE=$(LOGDATE) 2>&1 \
+		--label org.opencontainers.image.created=$(LOGDATE) 2>&1 \
 	| tee source/logs/build-$(CONTAINER_PROJECT)-$(CONTAINER_NAME)_$(CONTAINER_TAG)-$(LOGDATE).log ;\
 	docker inspect $(CONTAINER_STRING) > source/logs/inspect-$(CONTAINER_PROJECT)-$(CONTAINER_NAME)_$(CONTAINER_TAG)-$(LOGDATE).log
 
@@ -66,15 +68,18 @@ docker-multi: ## Multi-platform build.
 	$(call run_hadolint)
 	mkdir -vp  source/logs/ ; \
 	docker buildx build --platform linux/amd64,linux/arm64/v8 . \
-                -t $(CONTAINER_STRING) \
+		-t $(CONTAINER_STRING) \
+		--cache-from $(CONTAINER_STRING) \
 		--build-arg GW_ROOT=$(GW_ROOT) \
 		--build-arg GW_PORT=$(GW_PORT) \
-                --build-arg GWC_PORT=$(GWC_PORT) \
-                --build-arg GW_PR=$(GW_PR) \
+		--build-arg GWC_PORT=$(GWC_PORT) \
+		--build-arg GW_PR=$(GW_PR) \
+		--build-arg GW_VER=$(GW_VER) \
 		--label org.opencontainers.image.created=$(LOGDATE) \
-		--cache-from $(CONTAINER_STRING) \
 		--progress plain \
-		--push
+		--push \
+	| tee source/logs/build-$(CONTAINER_PROJECT)-$(CONTAINER_NAME)_$(CONTAINER_TAG)-$(LOGDATE).log ;\
+	docker inspect $(CONTAINER_STRING) > source/logs/inspect-$(CONTAINER_PROJECT)-$(CONTAINER_NAME)_$(CONTAINER_TAG)-$(LOGDATE).log
 
 destroy: ## obliterate the local image
 	[ "${C_IMAGES}" == "" ] || \
@@ -82,8 +87,9 @@ destroy: ## obliterate the local image
 
 apptainer: ## Build an apptainer sif image directly
 	apptainer build \
-            --build-arg CALIBRE_VERSION=$(CALIBRE_VERSION) \
-            /tmp/$(CONTAINER_NAME)_$(CALIBRE_VERSION).sif calibre.def
+                --build-arg GW_PR=$(GW_PR) \
+                --build-arg GW_VER=$(GW_VER) \
+            /tmp/$(CONTAINER_NAME)_$(GW_VER).sif geneweb.def
 
 run: ## run the image
 	[ "${C_IMAGES}" ] || \
