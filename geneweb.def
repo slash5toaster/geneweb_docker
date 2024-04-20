@@ -12,7 +12,7 @@ opt/geneweb/bashrc ${GW_ROOT}/.bashrc
 MAINTAINER="slash5toaster@gmail.com"
 PROJECT=geneweb
 NAME=geneweb
-VERSION=7.1.0
+VERSION=7.1.0-beta
 
 ###############################################################################
 %post
@@ -53,6 +53,7 @@ apt-get install -y \
         make \
         ocaml \
         procps \
+        rsync \
         tini \
         wget \
         unzip
@@ -63,13 +64,12 @@ apt-get install -y \
 # make geneweb
 cd /tmp/
 
-#    https://github.com/geneweb/geneweb/releases/download/Geneweb-48a588f8/geneweb-linux-48a588f8.zip
 # https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/geneweb-linux-${GW_PR}.zip \
-wget https://github.com/geneweb/geneweb/releases/download/${GW_VER}/geneweb-linux.zip \
+wget -c https://github.com/geneweb/geneweb/releases/download/${GW_VER}/geneweb-linux.zip \
      -O /tmp/geneweb-linux-${GW_VER}.zip \
   && cd ${GW_ROOT} \
   && unzip /tmp/geneweb-linux-${GW_VER}.zip \
-  && mv -v ${GW_ROOT}/distribution/* ${GW_ROOT} \
+  && mv -v ${GW_ROOT}/* ${GW_ROOT} \
   && rm -v /tmp/geneweb-linux-${GW_VER}.zip
 
 chown -cR ${GW_USER}.${GW_GROUP} ${GW_ROOT}

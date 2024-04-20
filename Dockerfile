@@ -51,9 +51,8 @@ RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
     && wget --progress=dot:giga \
             -c https://github.com/geneweb/geneweb/releases/download/${GW_VER}/geneweb-linux.zip \
             -O /tmp/build/geneweb-linux-${GW_VER}.zip \
-    && unzip /tmp/build/geneweb-linux-${GW_VER}.zip -d "/tmp/build/geneweb" \
-    && mkdir -vp ${GW_ROOT} ${GW_ROOT}/logs \
-    && mv -v /tmp/build/geneweb/* ${GW_ROOT}/
+    && unzip /tmp/build/geneweb-linux-${GW_VER}.zip -d "${GW_ROOT}" \
+    && mkdir -vp ${GW_ROOT} ${GW_ROOT}/logs 
 
 COPY opt/geneweb/startup.sh ${GW_ROOT}
 COPY opt/geneweb/bashrc ${GW_ROOT}/.bashrc
@@ -81,6 +80,6 @@ CMD [ "sh", "-c", "/opt/geneweb/startup.sh", "$@" ]
 LABEL org.opencontainers.image.vendor=slash5toaster \
       org.opencontainers.image.authors="slash5toaster@gmail.com" \
       org.opencontainers.image.ref.name=geneweb \
-      org.opencontainers.image.version=${GW_VER}
+      org.opencontainers.image.version=7.1.0-beta
 
 #### End of File, if this is missing the file has been truncated
