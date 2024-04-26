@@ -49,12 +49,11 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 # make geneweb
 WORKDIR /tmp/
-RUN git clone https://github.com/geneweb/geneweb \
+RUN git --depth=1 --no-single-branch https://github.com/geneweb/geneweb \
     && cd geneweb \
-    && git checkout tags/Geneweb-${GW_PR} \
-    && ocaml ./configure.ml \
-             --sosa-zarith \
-    && make distrib
+    && git checkout ${GW_VER} \
+    && opam exec -- ocaml ./configure.ml --release \
+    && opam exec -- make distrib
 
 USER ${GW_USER}
 WORKDIR ${GW_ROOT}
