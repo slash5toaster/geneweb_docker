@@ -29,23 +29,29 @@ RUN useradd ${GW_USER} \
 RUN pwck -s \
   ; grpck -s
 
-# Update OS to apply latest vulnerability fix
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get update && \
-    apt-get install -y \
+    add-apt-repository -y ppa:avsm/ppa \
+    && apt-get update \
+    && apt-get install -y \
             curl \
+            gcc \
             git \
             libcurl4-gnutls-dev \
             libgmp-dev \
+            libipc-system-simple-perl \
+            libstring-shellquote-perl \
             m4 \
             make \
             ocaml \
+            opam \
             procps \
             rsync \
             tini \
             unzip \
-            wget
+            vim \
+            wget \
+            xdot
 
 # setup opam
 RUN opam -y init --compiler=4.14.2 \
