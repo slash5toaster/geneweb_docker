@@ -5,7 +5,7 @@ DOCKER_REPO ?= localhost
 GW_PORT ?= 2317
 GWC_PORT ?= 2316
 GW_ROOT ?= /opt/geneweb
-GW_PR ?= 2ab85d8 
+GW_PR ?= 2ab85d8
 GW_VER ?= v7.1-beta
 
 # Date for log files

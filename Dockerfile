@@ -1,5 +1,8 @@
 FROM debian:unstable-slim
 
+ENV DEBIAN_FRONTEND=noninteractive
+RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+
 ARG GW_VER \
     GW_PR \
     GW_USER=geneweb \
@@ -31,10 +34,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && \
     apt-get install -y \
-            bubblewrap \
-            build-essential \
             curl \
-            gcc \
             git \
             libcurl4-gnutls-dev \
             libgmp-dev \
@@ -49,7 +49,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 # setup opam
 RUN opam -y init --compiler=4.14.2 \
-    && eval $(opam env)\
+    && eval $(opam env) \
     && opam install -y \
             calendars.1.0.0 \
             camlp-streams \
@@ -74,16 +74,19 @@ RUN opam -y init --compiler=4.14.2 \
     && opam list
 
 # make geneweb
-WORKDIR /tmp/
-RUN git --depth=1 --no-single-branch https://github.com/geneweb/geneweb \
+USER ${GW_USER}
+WORKDIR ${GW_ROOT}
+
+RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
+    cd /tmp/build/ \ 
+    && (test -e geneweb/.git || git --depth=1 --no-single-branch https://github.com/geneweb/geneweb) \
     && cd geneweb \
     && git checkout ${GW_VER} \
     && eval $(opam env) \
     && opam exec -- ocaml ./configure.ml --release \
     && opam exec -- make distrib
 
-USER ${GW_USER}
-WORKDIR ${GW_ROOT}
+RUN mv -v /tmp/build/geneweb/distribution/* /opt/geneweb/
 
 EXPOSE ${GWD_PORT} \
        ${GWSETUP_PORT} \
