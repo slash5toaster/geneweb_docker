@@ -33,7 +33,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
        apt-get update \
     && apt-get install -y \
-       software-properties-common
+       software-properties-common \
     && add-apt-repository -y ppa:avsm/ppa
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
