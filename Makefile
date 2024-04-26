@@ -64,7 +64,7 @@ setup-multi: ## setup docker multiplatform
 	docker buildx create --name buildx-multi-arch ; docker buildx use buildx-multi-arch
 
 docker-multi: ## Multi-platform build.
-	make setup-multi
+	$(call setup-multi)
 	$(call run_hadolint)
 	mkdir -vp  source/logs/ ; \
 	docker buildx build --platform linux/amd64,linux/arm64/v8 . \
@@ -77,7 +77,7 @@ docker-multi: ## Multi-platform build.
 		--build-arg GW_VER=$(GW_VER) \
 		--label org.opencontainers.image.created=$(LOGDATE) \
 		--progress plain \
-		--push \
+		--push 2>&1 \
 	| tee source/logs/build-$(CONTAINER_PROJECT)-$(CONTAINER_NAME)_$(CONTAINER_TAG)-$(LOGDATE).log ;\
 	docker inspect $(CONTAINER_STRING) > source/logs/inspect-$(CONTAINER_PROJECT)-$(CONTAINER_NAME)_$(CONTAINER_TAG)-$(LOGDATE).log
 
@@ -100,7 +100,7 @@ run: ## run the image
 		--detach \
 		-e TZ=PST8PDT \
 		-v "$(shell pwd)":/opt/devel \
-		-v "$(shell pwd)/bases/":$(GW_ROOT)/bases/ \
+		-v "$(shell pwd)/source/bases/":$(GW_ROOT)/bases/ \
 		--name $(CONTAINER_NAME) \
 		--hostname=$(CONTAINER_NAME)-$(CONTAINER_TAG) \
 		--publish $(GW_PORT):$(GW_PORT) \

@@ -29,10 +29,11 @@ RUN useradd ${GW_USER} \
 RUN pwck -s \
   ; grpck -s
 
+RUN add-apt-repository -y ppa:avsm/ppa \
+    && apt-get update
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    add-apt-repository -y ppa:avsm/ppa \
-    && apt-get update \
+       apt-get update \
     && apt-get install -y \
             curl \
             gcc \
