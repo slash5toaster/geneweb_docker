@@ -1,29 +1,58 @@
 #!/usr/bin/env bash
 
-sudo apt-get install ocaml curl make m4 unzip bubblewrap gcc libgmp-dev libcurl4-gnutls-dev git build-essential
-# Install Opam.
+set -x 
+uname -a 
 
-sudo apt-get install opam
-# If the Opam install fails with the command above, build and install the latest Opam version from its repository:
-# cd /tmp/
-# git clone https://github.com/ocaml/opam.git
-# cd opam
-# ./configure
-# make lib-ext
-# make
-# sudo make install
+GW_VER="v7.1-beta"
 
-opam init
-opam switch create 4.09.0
+apt update
+apt-get install -y \
+    software-properties-common
+add-apt-repository -y ppa:avsm/ppa
+apt update
+apt install -y \
+    curl \
+    gcc \
+    git \
+    libcurl4-gnutls-dev \
+    libgmp-dev \
+    libipc-system-simple-perl \
+    libstring-shellquote-perl \
+    opam \
+    vim \
+    xdot
+
+opam -y init --compiler=4.14.2
 eval $(opam env)
+opam install -y \
+    calendars.1.0.0 \
+    camlp-streams \
+    camlp5 \
+    cppo \
+    dune \
+    jingoo \
+    markup \
+    oUnit \
+    ppx_blob \
+    ppx_deriving \
+    ppx_import \
+    stdlib-shims \
+    syslog \
+    unidecode.0.2.0 \
+    uri \
+    uucp \
+    uutf \
+    uunf
 
-opam install depext
-opam install benchmark calendars camlp5.7.12 cppo dune.1.11.4 jingoo.1.4.1 markup num ounit stdlib-shims unidecode.0.2.0 uucp uunf zarith
+#[OPTIONAL] Verify installed versions of Ocaml and Opam versions, list Opam dependencies
+opam exec -- ocaml --version
+opam exec -- opam --version
+opam list
 
 # make geneweb
 cd /tmp/
-git clone https://github.com/geneweb/geneweb
-cd geneweb
-git checkout tags/v7.0.0 -b v7.0.0
-ocaml ./configure.ml --sosa-zarith
-make distrib
+git clone --depth=1 --no-single-branch https://github.com/geneweb/geneweb
+cd geneweb \
+&& git checkout ${GW_VER} \
+&& opam exec -- ocaml ./configure.ml --release \
+&& opam exec -- make distrib

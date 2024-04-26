@@ -29,8 +29,13 @@ RUN useradd ${GW_USER} \
 RUN pwck -s \
   ; grpck -s
 
-RUN add-apt-repository -y ppa:avsm/ppa \
-    && apt-get update
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+       apt-get update \
+    && apt-get install -y \
+       software-properties-common
+    && add-apt-repository -y ppa:avsm/ppa
+
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
        apt-get update \
