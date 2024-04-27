@@ -59,6 +59,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
             wget \
             xdot
 
+RUN echo "test -r /root/.opam/opam-init/init.sh && . /root/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true" >> ~/.profile
+
 # setup opam
 RUN opam -y init --compiler=4.14.2 \
     && eval $(opam env) \

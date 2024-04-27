@@ -22,6 +22,9 @@ apt install -y \
     vim \
     xdot
 
+test -r /root/.opam/opam-init/init.sh \
+&& source /root/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
+
 opam -y init --compiler=4.14.2
 eval $(opam env)
 opam install -y \
@@ -52,7 +55,7 @@ opam list
 # make geneweb
 cd /tmp/
 git clone --depth=1 --no-single-branch https://github.com/geneweb/geneweb
-cd geneweb \
-&& git checkout ${GW_VER} \
-&& opam exec -- ocaml ./configure.ml --release \
-&& opam exec -- make distrib
+cd geneweb
+git checkout ${GW_VER}
+opam exec -- ocaml ./configure.ml --release
+opam exec -- make distrib
