@@ -115,9 +115,10 @@ WORKDIR ${GW_ROOT}
 
 RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
     cd /tmp/build/ \ 
-    && (test -e geneweb/.git || git --depth=1 --no-single-branch https://github.com/geneweb/geneweb) \
-    && cd geneweb \
-    && git checkout ${GW_VER} \
+    && (test -e /tmp/build/geneweb/.git || git clone --depth=1 --no-single-branch https://github.com/geneweb/geneweb /tmp/build/geneweb) \
+    && cd /tmp/build/geneweb \
+    && git checkout ${GW_VER}
+RUN cd /tmp/build/geneweb \
     && eval $(opam env) \
     && opam exec -- ocaml ./configure.ml --release \
     && opam exec -- make distrib
