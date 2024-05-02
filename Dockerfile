@@ -32,13 +32,6 @@ RUN useradd ${GW_USER} \
 RUN pwck -s \
   ; grpck -s
 
-# RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-#     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-#        apt-get update \
-#     && apt-get install -y \
-#        software-properties-common \
-#     && add-apt-repository -y ppa:avsm/ppa
-
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
        apt-get update \
@@ -52,8 +45,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
             libstring-shellquote-perl \
             m4 \
             make \
-            # ocaml \
-            # opam \
             procps \
             rsync \
             tini \
@@ -87,7 +78,7 @@ https://github.com/ocaml/opam/releases/download/${OPAM_VER}/opam-${OPAM_VER}-$(u
 RUN echo "test -r /root/.opam/opam-init/init.sh && . /root/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true" >> ~/.profile
 
 # setup opam
-RUN opam -y init --compiler=4.14.2 \
+RUN opam -y init --compiler=${OCAML_VER} \
     && eval $(opam env) \
     && opam install -y \
             calendars.1.0.0 \
