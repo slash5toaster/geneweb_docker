@@ -38,6 +38,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
        apt-get update \
     && apt-get install -y \
+            bubblewrap \
+            bzip2 \
             curl \
             gcc \
             git \
@@ -74,12 +76,14 @@ RUN wget -c \
     https://github.com/ocaml/opam/releases/download/${OPAM_VER}/opam-${OPAM_VER}-${TARGETARCH}-${TARGETOS} \
 -O /usr/local/bin/opam \
 && wget -c \
-https://github.com/ocaml/opam/releases/download/${OPAM_VER}/opam-${OPAM_VER}-$(uname -p)-$(uname -s | tr '[:upper:]' '[:lower:]').sig \
--O /tmp/opam.sig  
+    https://github.com/ocaml/opam/releases/download/${OPAM_VER}/opam-${OPAM_VER}-${TARGETARCH}-${TARGETOS}.sig \
+-O /tmp/opam.sig \
+    && chmod +x /usr/local/bin/opam
 
 RUN echo "test -r /root/.opam/opam-init/init.sh && . /root/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true" >> ~/.profile
 
 # setup opam
+RUN type opam
 RUN opam -y init --compiler=${OCAML_VER} \
     && eval $(opam env) \
     && opam install -y \
