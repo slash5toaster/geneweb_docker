@@ -8,7 +8,10 @@ ARG GW_VER \
     GW_USER=geneweb \
     GW_GROUP=geneweb \
     GW_UID=115 \
-    GW_GID=115
+    GW_GID=115 \
+    OCAML_VER \
+    OPAM_VER
+
 ENV GW_ROOT=/opt/geneweb \
     GWD_PORT=2317 \
     GWSETUP_PORT=2316 \
@@ -29,12 +32,12 @@ RUN useradd ${GW_USER} \
 RUN pwck -s \
   ; grpck -s
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-       apt-get update \
-    && apt-get install -y \
-       software-properties-common \
-    && add-apt-repository -y ppa:avsm/ppa
+# RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+#     --mount=type=cache,target=/var/lib/apt,sharing=locked \
+#        apt-get update \
+#     && apt-get install -y \
+#        software-properties-common \
+#     && add-apt-repository -y ppa:avsm/ppa
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -49,8 +52,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
             libstring-shellquote-perl \
             m4 \
             make \
-            ocaml \
-            opam \
+            # ocaml \
+            # opam \
             procps \
             rsync \
             tini \
@@ -58,6 +61,28 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
             vim \
             wget \
             xdot
+
+# manually install ocaml and opam
+# https://github.com/ocaml/ocaml/archive/refs/tags/4.14.2.zip
+RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
+       cd /tmp/build/ \
+    && ls /tmp/build/ \
+    && wget --progress=dot:giga \
+            -c  https://github.com/ocaml/ocaml/archive/refs/tags/${OCAML_VER}.tar.gz \
+            -O /tmp/build/${OCAML_VER}.tar.gz \
+    && tar -xzvf /tmp/build/${OCAML_VER}.tar.gz \
+    && cd /tmp/build/ocaml-${OCAML_VER}/ \
+    && ./configure \
+    && make clean \
+    && make \
+    && make install
+
+RUN wget -c \
+    https://github.com/ocaml/opam/releases/download/${OPAM_VER}/opam-${OPAM_VER}-$(uname -p)-$(uname -s | tr '[:upper:]' '[:lower:]') \
+-O /usr/local/bin/opam \
+&& wget -c \
+https://github.com/ocaml/opam/releases/download/${OPAM_VER}/opam-${OPAM_VER}-$(uname -p)-$(uname -s | tr '[:upper:]' '[:lower:]').sig \
+-O /tmp/opam.sig  
 
 RUN echo "test -r /root/.opam/opam-init/init.sh && . /root/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true" >> ~/.profile
 

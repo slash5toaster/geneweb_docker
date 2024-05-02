@@ -7,6 +7,8 @@ GWC_PORT ?= 2316
 GW_ROOT ?= /opt/geneweb
 GW_PR ?= 2ab85d8
 GW_VER ?= v7.1-beta
+OCAML_VER ?= 4.14.2
+OPAM_VER ?= 2.1.5
 
 # Date for log files
 LOGDATE := $(shell date +%F-%H%M)
@@ -55,6 +57,8 @@ docker: ## Build the docker image locally.
 		--build-arg GWC_PORT=$(GWC_PORT) \
 		--build-arg GW_PR=$(GW_PR) \
 		--build-arg GW_VER=$(GW_VER) \
+		--build-arg OCAML_VER=$(OCAML_VER) \
+		--build-arg OPAM_VER=$(OPAM_VER) \
 		--progress plain \
 		--label org.opencontainers.image.created=$(LOGDATE) 2>&1 \
 	| tee source/logs/build-$(CONTAINER_PROJECT)-$(CONTAINER_NAME)_$(CONTAINER_TAG)-$(LOGDATE).log ;\
@@ -75,6 +79,8 @@ docker-multi: ## Multi-platform build.
 		--build-arg GWC_PORT=$(GWC_PORT) \
 		--build-arg GW_PR=$(GW_PR) \
 		--build-arg GW_VER=$(GW_VER) \
+		--build-arg OCAML_VER=$(OCAML_VER) \
+		--build-arg OPAM_VER=$(OPAM_VER) \
 		--label org.opencontainers.image.created=$(LOGDATE) \
 		--progress plain \
 		--push 2>&1 \
