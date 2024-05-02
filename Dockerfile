@@ -10,7 +10,9 @@ ARG GW_VER \
     GW_UID=115 \
     GW_GID=115 \
     OCAML_VER \
-    OPAM_VER
+    OPAM_VER \
+    TARGETOS \
+    TARGETARCH
 
 ENV GW_ROOT=/opt/geneweb \
     GWD_PORT=2317 \
@@ -69,7 +71,7 @@ RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
     && make install
 
 RUN wget -c \
-    https://github.com/ocaml/opam/releases/download/${OPAM_VER}/opam-${OPAM_VER}-$(uname -p)-$(uname -s | tr '[:upper:]' '[:lower:]') \
+    https://github.com/ocaml/opam/releases/download/${OPAM_VER}/opam-${OPAM_VER}-${TARGETARCH}-${TARGETOS} \
 -O /usr/local/bin/opam \
 && wget -c \
 https://github.com/ocaml/opam/releases/download/${OPAM_VER}/opam-${OPAM_VER}-$(uname -p)-$(uname -s | tr '[:upper:]' '[:lower:]').sig \
