@@ -109,10 +109,6 @@ RUN opam -y init --compiler=${OCAML_VER} \
     && opam exec -- opam --version \
     && opam list
 
-# make geneweb
-USER ${GW_USER}
-WORKDIR ${GW_ROOT}
-
 RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
     cd /tmp/build/ \ 
     && (test -e /tmp/build/geneweb/.git || git clone --depth=1 --no-single-branch https://github.com/geneweb/geneweb /tmp/build/geneweb) \
@@ -124,6 +120,11 @@ RUN cd /tmp/build/geneweb \
     && opam exec -- make distrib
 
 RUN mv -v /tmp/build/geneweb/distribution/* /opt/geneweb/
+
+# make geneweb
+USER ${GW_USER}
+WORKDIR ${GW_ROOT}
+
 
 EXPOSE ${GWD_PORT} \
        ${GWSETUP_PORT} \
