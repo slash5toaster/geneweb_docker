@@ -22,16 +22,15 @@ ENV GW_ROOT=/opt/geneweb \
 
 # Add geneweb user
 RUN groupadd ${GW_GROUP} \
-          -g ${GW_GID}
-RUN useradd ${GW_USER} \
+          -g ${GW_GID} \
+ && useradd ${GW_USER} \
          -u ${GW_UID} \
          -g ${GW_GROUP} \
          -m -d ${GW_ROOT} \
          --system \
          -l \
-         -s /bin/bash
-
-RUN pwck -s \
+         -s /bin/bash \
+  ; pwck -s \
   ; grpck -s
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -72,18 +71,15 @@ RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
     && make \
     && make install
 
-RUN wget -c \
+#   https://github.com/ocaml/opam/releases/download/2.1.5/opam-2.1.5-arm64-linux
+RUN wget -c --progress=dot:giga \
     https://github.com/ocaml/opam/releases/download/${OPAM_VER}/opam-${OPAM_VER}-${TARGETARCH}-${TARGETOS} \
     -O /usr/bin/opam \
- && wget -c \
-    https://github.com/ocaml/opam/releases/download/${OPAM_VER}/opam-${OPAM_VER}-${TARGETARCH}-${TARGETOS}.sig \
-    -O /tmp/opam.sig \
  && chmod -c +x /usr/bin/opam
 
 RUN echo "test -r /root/.opam/opam-init/init.sh && . /root/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true" >> ~/.profile
 
 # setup opam
-RUN type opam
 RUN opam -y init --compiler=${OCAML_VER} \
     && eval $(opam env) \
     && opam install -y \
@@ -119,12 +115,12 @@ RUN cd /tmp/build/geneweb \
     && opam exec -- ocaml ./configure.ml --release \
     && opam exec -- make distrib
 
-RUN mv -v /tmp/build/geneweb/distribution/* /opt/geneweb/
+RUN rsync -azv /tmp/build/geneweb/distribution/ /opt/geneweb/ \
+    chown -cR ${GW_USER}:${GW_GROUP} /opt/geneweb/
 
 # make geneweb
 USER ${GW_USER}
 WORKDIR ${GW_ROOT}
-
 
 EXPOSE ${GWD_PORT} \
        ${GWSETUP_PORT} \
