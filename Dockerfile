@@ -74,11 +74,11 @@ RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
 
 RUN wget -c \
     https://github.com/ocaml/opam/releases/download/${OPAM_VER}/opam-${OPAM_VER}-${TARGETARCH}-${TARGETOS} \
--O /usr/local/bin/opam \
-&& wget -c \
+    -O /usr/bin/opam \
+ && wget -c \
     https://github.com/ocaml/opam/releases/download/${OPAM_VER}/opam-${OPAM_VER}-${TARGETARCH}-${TARGETOS}.sig \
--O /tmp/opam.sig \
-    && chmod +x /usr/local/bin/opam
+    -O /tmp/opam.sig \
+ && chmod -c +x /usr/bin/opam
 
 RUN echo "test -r /root/.opam/opam-init/init.sh && . /root/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true" >> ~/.profile
 
@@ -104,8 +104,8 @@ RUN opam -y init --compiler=${OCAML_VER} \
             uri \
             uucp \
             uutf \
-            uunf \
-    && opam exec -- ocaml --version \
+            uunf
+RUN opam exec -- ocaml --version \
     && opam exec -- opam --version \
     && opam list
 
