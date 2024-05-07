@@ -107,16 +107,18 @@ RUN opam exec -- ocaml --version \
 
 RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
     cd /tmp/build/ \ 
-    && (test -e /tmp/build/geneweb/.git || git clone --depth=1 --no-single-branch https://github.com/geneweb/geneweb /tmp/build/geneweb) \
-    && cd /tmp/build/geneweb \
-    && git checkout ${GW_VER}
-RUN cd /tmp/build/geneweb \
-    && eval $(opam env) \
-    && opam exec -- ocaml ./configure.ml --release \
-    && opam exec -- make distrib
+ && (test -e /tmp/build/geneweb/.git || git clone --depth=1 --no-single-branch https://github.com/geneweb/geneweb /tmp/build/geneweb) \
+ && cd /tmp/build/geneweb \
+ && git checkout ${GW_VER}
+RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
+    cd /tmp/build/geneweb \
+ && eval $(opam env) \
+ && opam exec -- ocaml ./configure.ml --release \
+ && opam exec -- make distrib
 
-RUN rsync -azv /tmp/build/geneweb/distribution/ /opt/geneweb/ \
-    chown -cR ${GW_USER}:${GW_GROUP} /opt/geneweb/
+RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
+    rsync -azv /tmp/build/geneweb/distribution/ /opt/geneweb/ \
+ && chown -cR ${GW_USER}:${GW_GROUP} /opt/geneweb/
 
 # make geneweb
 USER ${GW_USER}
