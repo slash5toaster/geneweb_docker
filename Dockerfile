@@ -58,21 +58,20 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 # manually install ocaml and opam
 # https://github.com/ocaml/ocaml/archive/refs/tags/4.14.2.zip
+# https://github.com/ocaml/opam/releases/download/2.1.5/opam-2.1.5-arm64-linux
 RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
        cd /tmp/build/ \
-    && ls /tmp/build/ \
-    && wget --progress=dot:giga \
-            -c  https://github.com/ocaml/ocaml/archive/refs/tags/${OCAML_VER}.tar.gz \
-            -O /tmp/build/${OCAML_VER}.tar.gz \
-    && tar -xzvf /tmp/build/${OCAML_VER}.tar.gz \
-    && cd /tmp/build/ocaml-${OCAML_VER}/ \
-    && ./configure \
-    && make clean \
-    && make \
-    && make install
-
-#   https://github.com/ocaml/opam/releases/download/2.1.5/opam-2.1.5-arm64-linux
-RUN wget -c --progress=dot:giga \
+ && ls /tmp/build/ \
+ && wget --progress=dot:giga \
+         -c  https://github.com/ocaml/ocaml/archive/refs/tags/${OCAML_VER}.tar.gz \
+         -O /tmp/build/${OCAML_VER}.tar.gz \
+ && tar -xzvf /tmp/build/${OCAML_VER}.tar.gz \
+ && cd /tmp/build/ocaml-${OCAML_VER}/ \
+ && ./configure \
+ && make clean \
+ && make \
+ && make install \
+ && wget -c --progress=dot:giga \
     https://github.com/ocaml/opam/releases/download/${OPAM_VER}/opam-${OPAM_VER}-${TARGETARCH}-${TARGETOS} \
     -O /usr/bin/opam \
  && chmod -c +x /usr/bin/opam
