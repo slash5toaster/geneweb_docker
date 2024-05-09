@@ -80,29 +80,29 @@ RUN echo "test -r /root/.opam/opam-init/init.sh && . /root/.opam/opam-init/init.
 
 # setup opam
 RUN opam -y init --compiler=${OCAML_VER} \
-    && eval $(opam env) \
-    && opam install -y \
-            calendars.1.0.0 \
-            camlp-streams \
-            camlp5 \
-            cppo \
-            dune \
-            jingoo \
-            markup \
-            oUnit \
-            ppx_blob \
-            ppx_deriving \
-            ppx_import \
-            stdlib-shims \
-            syslog \
-            unidecode.0.2.0 \
-            uri \
-            uucp \
-            uutf \
-            uunf
-RUN opam exec -- ocaml --version \
-    && opam exec -- opam --version \
-    && opam list
+ && eval $(opam env) \
+ && opam install -y \
+         calendars.1.0.0 \
+         camlp-streams \
+         camlp5 \
+         cppo \
+         dune \
+         jingoo \
+         markup \
+         oUnit \
+         ppx_blob \
+         ppx_deriving \
+         ppx_import \
+         stdlib-shims \
+         syslog \
+         unidecode.0.2.0 \
+         uri \
+         uucp \
+         uutf \
+         uunf \
+ && opam exec -- ocaml --version \
+ && opam exec -- opam --version \
+ && opam list
 
 RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
     cd /tmp/build/ \ 
