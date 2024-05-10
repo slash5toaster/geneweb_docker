@@ -66,7 +66,7 @@ start()
     echo "Starting Geneweb"
     test -e ${GW_LOGDIR}/gwd.log && mv ${GW_LOGDIR}/gwd.log.old
 
-    tini ${GW_ROOT}/gwd -- ${GWD_OPTS}
+    ${GW_ROOT}/gw/gwd -- ${GWD_OPTS}
   fi
 }
 
