@@ -65,14 +65,17 @@ RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
  && wget --progress=dot:giga \
          -c  https://github.com/ocaml/ocaml/archive/refs/tags/${OCAML_VER}.tar.gz \
          -O /tmp/build/${OCAML_VER}.tar.gz \
- && tar -xzvf /tmp/build/${OCAML_VER}.tar.gz \
+ && tar -xzf /tmp/build/${OCAML_VER}.tar.gz \
  && cd /tmp/build/ocaml-${OCAML_VER}/ \
  && ./configure \
  && make clean \
  && make \
- && make install \
+ && make install
+
+# convert amd64 to x86_64
+RUN if [ "${TARGETARCH}" == "amd64" ]; then export MYARCH="x86_64" else MYARCH=${TARGETARCH}; fi \
  && wget -c --progress=dot:giga \
-    https://github.com/ocaml/opam/releases/download/${OPAM_VER}/opam-${OPAM_VER}-${TARGETARCH}-${TARGETOS} \
+    https://github.com/ocaml/opam/releases/download/${OPAM_VER}/opam-${OPAM_VER}-${MYARCH}-${TARGETOS} \
     -O /usr/bin/opam \
  && chmod -c +x /usr/bin/opam
 
@@ -108,15 +111,12 @@ RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
     cd /tmp/build/ \ 
  && (test -e /tmp/build/geneweb/.git || git clone --depth=1 --no-single-branch https://github.com/geneweb/geneweb /tmp/build/geneweb) \
  && cd /tmp/build/geneweb \
- && git checkout ${GW_VER}
-RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
-    cd /tmp/build/geneweb \
+ && ls -l \
+ && git checkout ${GW_VER} \
  && eval $(opam env) \
  && opam exec -- ocaml ./configure.ml --release \
- && opam exec -- make distrib
-
-RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
-    rsync -azv /tmp/build/geneweb/distribution/ /opt/geneweb/ \
+ && opam exec -- make distrib \
+ && rsync -azv /tmp/build/geneweb/distribution/ /opt/geneweb/ \
  && chown -cR ${GW_USER}:${GW_GROUP} /opt/geneweb/
 
 # make geneweb
