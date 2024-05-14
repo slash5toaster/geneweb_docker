@@ -84,8 +84,7 @@ docker-multi: ## Multi-platform build.
 		--label org.opencontainers.image.created=$(LOGDATE) \
 		--progress plain \
 		--push 2>&1 \
-	| tee source/logs/build-$(CONTAINER_PROJECT)-$(CONTAINER_NAME)_$(CONTAINER_TAG)-$(LOGDATE).log && \
-	docker inspect $(CONTAINER_STRING) > source/logs/inspect-$(CONTAINER_PROJECT)-$(CONTAINER_NAME)_$(CONTAINER_TAG)-$(LOGDATE).log
+	| tee source/logs/build-$(CONTAINER_PROJECT)-$(CONTAINER_NAME)_$(CONTAINER_TAG)-$(LOGDATE).log
 
 destroy: ## obliterate the local image
 	[ "${C_IMAGES}" == "" ] || \
