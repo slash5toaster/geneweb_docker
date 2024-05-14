@@ -73,11 +73,8 @@ RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
  && make install
 
 # convert amd64 to x86_64
-RUN if [ "${TARGETARCH}" == "amd64" ]; then export MYARCH="x86_64" else MYARCH=${TARGETARCH}; fi \
- && wget -c --progress=dot:giga \
-    https://github.com/ocaml/opam/releases/download/${OPAM_VER}/opam-${OPAM_VER}-${MYARCH}-${TARGETOS} \
-    -O /usr/bin/opam \
- && chmod -c +x /usr/bin/opam
+COPY build/install_opam.sh /tmp/build/install_opam.sh
+RUN /tmp/build/install_opam.sh ${TARGETARCH}
 
 RUN echo "test -r /root/.opam/opam-init/init.sh && . /root/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true" >> ~/.profile
 
