@@ -116,6 +116,9 @@ RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
  && rsync -azv /tmp/build/geneweb/distribution/ /opt/geneweb/ \
  && chown -cR ${GW_USER}:${GW_GROUP} /opt/geneweb/
 
+COPY opt/geneweb/startup.sh /opt/geneweb/startup.sh
+COPY opt/geneweb/bashrc /opt/geneweb/.bashrc
+
 # make geneweb
 USER ${GW_USER}
 WORKDIR ${GW_ROOT}
