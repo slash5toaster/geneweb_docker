@@ -53,6 +53,7 @@ apt-get install -y \
         make \
         ocaml \
         procps \
+        rsync \
         tini \
         wget \
         unzip
@@ -65,7 +66,7 @@ cd /tmp/
 
 #    https://github.com/geneweb/geneweb/releases/download/Geneweb-48a588f8/geneweb-linux-48a588f8.zip
 # https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/geneweb-linux-${GW_PR}.zip \
-wget https://github.com/geneweb/geneweb/releases/download/${GW_VER}/geneweb-linux.zip \
+wget -c https://github.com/geneweb/geneweb/releases/download/${GW_VER}/geneweb-linux.zip \
      -O /tmp/geneweb-linux-${GW_VER}.zip \
   && cd ${GW_ROOT} \
   && unzip /tmp/geneweb-linux-${GW_VER}.zip \
