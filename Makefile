@@ -93,7 +93,7 @@ apptainer: ## Build an apptainer sif image directly
 
 run: ## run the image
 	[ "${C_IMAGES}" ] || \
-		make local
+		make docker
 	[ "${C_ID}" ] || \
 	docker run \
 		--rm \
@@ -124,7 +124,7 @@ kill: ## shutdown
 
 publish: ## Push server image to remote
 	[ "${C_IMAGES}" ] || \
-		make local
+		make docker
 	@echo 'pushing $(CONTAINER_STRING) to $(DOCKER_REPO)'
 	docker push $(CONTAINER_STRING)
 
