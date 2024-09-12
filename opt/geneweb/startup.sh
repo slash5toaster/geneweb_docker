@@ -14,6 +14,7 @@ GWSETUP_PORT=${GWSETUP_PORT:="2316"}
 # default options - this can be overridden by setting environment vars
 
 GWD_OPTS=${GWD_OPTS:=" -lang ${GW_LANG} \
+                       -blang \
                        -log ${GW_LOGDIR}/gwd.log \
                        -p $GWD_PORT \
                        -bd ${GW_BASES}
@@ -22,6 +23,7 @@ GWS_OPTS=${GWS_OPTS:=" -lang ${GW_LANG} \
                        -bd ${GW_BASES} \
                        -only ${GW_BASES}/only.txt \
                        -p $GWSETUP_PORT
+                       -gwd_p $GWD_PORT
                        "}
 #make clean
 GWD_OPTS=$(echo ${GWD_OPTS} | tr -s '[[:blank:]]')
@@ -66,7 +68,7 @@ start()
     echo "Starting Geneweb"
     test -e ${GW_LOGDIR}/gwd.log && mv ${GW_LOGDIR}/gwd.log.old
 
-    ${GW_ROOT}/gw/gwd -- ${GWD_OPTS}
+    ${GW_ROOT}/gw/gwd ${GWD_OPTS}
   fi
 }
 
@@ -76,7 +78,7 @@ launch_setup()
   if [[ $(pgrep gwsetup) ]]; then
       echo "gwsetup running as $(pgrep -a setup)"
   else
-    tini ${GW_ROOT}/gwsetup -- ${GWS_OPTS}
+    ${GW_ROOT}/gwsetup ${GWS_OPTS}
   fi
 }
 #=============================================================================
