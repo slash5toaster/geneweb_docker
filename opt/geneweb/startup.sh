@@ -67,6 +67,7 @@ start()
     echo "Starting Geneweb"
     test -e ${GW_LOGDIR}/gwd.log && mv ${GW_LOGDIR}/gwd.log ${GW_LOGDIR}/gwd.log.old
 
+    cd ${GW_ROOT}/bases/
     ${GW_ROOT}/gw/gwd ${GWD_OPTS}
   fi
 }
@@ -77,7 +78,7 @@ launch_setup()
   if [[ $(pgrep gwsetup) ]]; then
       echo "gwsetup running as $(pgrep -a setup)"
   else
-   cd ${GW_ROOT}/gw/
+    cd ${GW_ROOT}/bases/
     ${GW_ROOT}/gw/gwsetup ${GWS_OPTS}
   fi
 }
