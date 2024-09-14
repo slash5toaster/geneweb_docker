@@ -34,10 +34,10 @@ groupadd {{ GW_GROUP }} \
           -g {{ GW_GID }}
 
 useradd {{ GW_USER }} \
-        -r \
         -u {{ GW_UID }} \
         -g {{ GW_GROUP }} \
         -m -d {{ GW_ROOT }} \
+        --system \
         -s /bin/bash
 
 pwck -s
