@@ -103,8 +103,6 @@ apptainer: ## Build an apptainer sif image directly
 		--build-arg GW_GID=$(GW_GID) \
 		--build-arg GW_USER=$(GW_USER) \
 		--build-arg GW_UID=$(GW_UID) \
-		--build-arg GW_ROOT=$(GW_ROOT) \
-		--build-arg GW_ROOT=$(GW_ROOT) \
             /tmp/$(CONTAINER_NAME)_$(GW_VER).sif geneweb.def
 
 run: ## run the image
