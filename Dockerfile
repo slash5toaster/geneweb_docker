@@ -8,7 +8,7 @@ ARG GW_VER \
     GW_GID=115
 ENV GW_ROOT=/opt/geneweb \
     GWD_PORT=2317 \
-    GWSETUP_PORT=2316 \
+    GWC_PORT=2316 \
     HTTP_PORT=80 \
     HTTPS_PORT=443
 
@@ -36,7 +36,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
             ocaml \
             procps \
             rsync \
-            tini \
             unzip \
             wget
 
@@ -64,7 +63,7 @@ USER ${GW_USER}
 WORKDIR ${GW_ROOT}
 
 EXPOSE ${GWD_PORT} \
-       ${GWSETUP_PORT} \
+       ${GWC_PORT} \
        ${HTTP_PORT} \
        ${HTTPS_PORT}
 
