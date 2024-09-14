@@ -4,8 +4,8 @@ Stage: spython-base
 
 ###############################################################################
 %files
-opt/geneweb/startup.sh {{ GW_ROOT }}/
-# opt/geneweb/bashrc {{ GW_ROOT }}/.bashrc
+   opt/geneweb/startup.sh {{ GW_ROOT }}/
+   opt/geneweb/bashrc {{ GW_ROOT }}/.bashrc
 
 ###############################################################################
 %labels
@@ -15,19 +15,20 @@ opt/geneweb/startup.sh {{ GW_ROOT }}/
    org.opencontainers.image.version={{ GW_VER }}
 ###############################################################################
 %post
-GW_VER={{ GW_VER }}
-GW_PR={{ GW_PR }}
+   GW_VER={{ GW_VER }}
+   GW_PR={{ GW_PR }}
 
-GW_USER={{ GW_USER }}
-GW_GROUP={{ GW_GROUP }}
-GW_UID={{ GW_UID }}
-GW_GID={{ GW_GID }}
+   GW_USER={{ GW_USER }}
+   GW_GROUP={{ GW_GROUP }}
+   GW_UID={{ GW_UID }}
+   GW_GID={{ GW_GID }}
 
-GW_ROOT={{ GW_ROOT }}
+   GW_ROOT={{ GW_ROOT }}
 
-GWD_PORT={{ GWD_PORT }}
-GWC_PORT={{ GWC_PORT }}
+   GWD_PORT={{ GWD_PORT }}
+   GWC_PORT={{ GWC_PORT }}
 
+###  Start installation
 # Add geneweb user
 groupadd {{ GW_GROUP }} \
           -g {{ GW_GID }}
@@ -80,26 +81,27 @@ cd {{ GW_ROOT }}
 
 ###############################################################################
 %environment
-export GW_VER={{ GW_VER }}
-export GW_PR={{ GW_PR }}
-export GW_USER={{ GW_USER }}
-export GW_GROUP={{ GW_GROUP }}
-export GW_UID={{ GW_UID }}
-export GW_GID={{ GW_GID }}
-export GW_ROOT={{ GW_ROOT }}
-export GWD_PORT={{ GWD_PORT }}
-export GWC_PORT={{ GWC_PORT }}
+   export GW_VER={{ GW_VER }}
+   export GW_PR={{ GW_PR }}
+   export GW_USER={{ GW_USER }}
+   export GW_GROUP={{ GW_GROUP }}
+   export GW_UID={{ GW_UID }}
+   export GW_GID={{ GW_GID }}
+   export GW_ROOT={{ GW_ROOT }}
+   export GWD_PORT={{ GWD_PORT }}
+   export GWC_PORT={{ GWC_PORT }}
+   export PATH={{ GW_ROOT }}/gw/:$PATH
 
 ###############################################################################
 %runscript
-cd {{ GW_ROOT }}
-#/opt/geneweb/startup.sh "$@"
+   cd {{ GW_ROOT }}
+#  {{ GW_ROOT }}/startup.sh "$@"
 
 ###############################################################################
 %startscript
-cd {{ GW_ROOT }}
-{{ GW_ROOT }}/gwd -help
+   cd {{ GW_ROOT }}
+   {{ GW_ROOT }}/gw/gwd -version
 
 ###############################################################################
 %test
-{{ GW_ROOT }}/gw/gwd -version
+   {{ GW_ROOT }}/gw/gwd -version
