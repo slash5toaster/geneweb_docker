@@ -20,6 +20,7 @@ GWD_OPTS=${GWD_OPTS:=" -lang ${GW_LANG} \
                        "}
 GWS_OPTS=${GWS_OPTS:=" -lang ${GW_LANG} \
                        -bd ${GW_BASES} \
+                       -gd ${GW_ROOT}/gw \
                        -only ${GW_BASES}/only.txt \
                        -p $GWC_PORT
                        "}
@@ -76,6 +77,7 @@ launch_setup()
   if [[ $(pgrep gwsetup) ]]; then
       echo "gwsetup running as $(pgrep -a setup)"
   else
+   cd ${GW_ROOT}/gw/
     ${GW_ROOT}/gw/gwsetup ${GWS_OPTS}
   fi
 }
