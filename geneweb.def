@@ -4,7 +4,7 @@ Stage: spython-base
 
 ###############################################################################
 %files
-opt/geneweb/startup.sh {{ GW_ROOT }}
+opt/geneweb/startup.sh {{ GW_ROOT }}/
 # opt/geneweb/bashrc {{ GW_ROOT }}/.bashrc
 
 ###############################################################################
@@ -33,6 +33,7 @@ groupadd {{ GW_GROUP }} \
           -g {{ GW_GID }}
 
 useradd {{ GW_USER }} \
+        -r \
         -u {{ GW_UID }} \
         -g {{ GW_GROUP }} \
         -m -d {{ GW_ROOT }} \
@@ -101,5 +102,4 @@ cd {{ GW_ROOT }}
 
 ###############################################################################
 %test
-# curl -s --fail http://localhost:2317 -o /dev/null
-{{ GW_GROUP }}/gwd -help
+{{ GW_ROOT }}/gw/gwd -version

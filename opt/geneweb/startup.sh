@@ -9,7 +9,7 @@ GW_ROOT=${GW_ROOT:="/opt/geneweb"}
 GW_BASES=${GW_BASES:="${GW_ROOT}/bases/"}
 GW_LOGDIR=${GW_LOGDIR:="${GW_ROOT}/logs"}
 GWD_PORT=${GWD_PORT:="2317"}
-GWSETUP_PORT=${GWSETUP_PORT:="2316"}
+GWC_PORT=${GWC_PORT:="2316"}
 
 # default options - this can be overridden by setting environment vars
 
@@ -21,7 +21,7 @@ GWD_OPTS=${GWD_OPTS:=" -lang ${GW_LANG} \
 GWS_OPTS=${GWS_OPTS:=" -lang ${GW_LANG} \
                        -bd ${GW_BASES} \
                        -only ${GW_BASES}/only.txt \
-                       -p $GWSETUP_PORT
+                       -p $GWC_PORT
                        "}
 #make clean
 GWD_OPTS=$(echo ${GWD_OPTS} | tr -s '[[:blank:]]')
