@@ -94,7 +94,7 @@ destroy: ## obliterate the local image
 
 apptainer: ## Build an apptainer sif image directly
 	apptainer build \
-        	--build-arg GW_VER=$(GW_VER) \
+		--build-arg GW_VER=$(GW_VER) \
 		--build-arg GW_PR=$(GW_PR) \
 		--build-arg GWC_PORT=$(GWC_PORT) \
 		--build-arg GWD_PORT=$(GWD_PORT) \
