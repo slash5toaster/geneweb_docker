@@ -1,39 +1,43 @@
 Bootstrap: docker
-From: debian:stable-slim
+From: debian:unstable-slim
 Stage: spython-base
 
 ###############################################################################
 %files
-opt/geneweb/startup.sh ${GW_ROOT}
-opt/geneweb/bashrc ${GW_ROOT}/.bashrc
+   opt/geneweb/startup.sh {{ GW_ROOT }}/
+   opt/geneweb/bashrc {{ GW_ROOT }}/.bashrc
 
 ###############################################################################
 %labels
-MAINTAINER="slash5toaster@gmail.com"
-PROJECT=geneweb
-NAME=geneweb
-VERSION=7.0.0
-
+   org.opencontainers.image.vendor=slash5toaster
+   org.opencontainers.image.authors=slash5toaster@gmail.com
+   org.opencontainers.image.ref.name=geneweb
+   org.opencontainers.image.version={{ GW_VER }}
 ###############################################################################
 %post
-GW_VER=7.0.0
-GW_PR=88536ed
-GW_USER=geneweb
-GW_GROUP=geneweb
-GW_UID=115
-GW_GID=115
-GW_ROOT=/opt/geneweb
-GWD_PORT=2317
-GWSETUP_PORT=2316
+   GW_VER={{ GW_VER }}
+   GW_PR={{ GW_PR }}
 
+   GW_USER={{ GW_USER }}
+   GW_GROUP={{ GW_GROUP }}
+   GW_UID={{ GW_UID }}
+   GW_GID={{ GW_GID }}
+
+   GW_ROOT={{ GW_ROOT }}
+
+   GWD_PORT={{ GWD_PORT }}
+   GWC_PORT={{ GWC_PORT }}
+
+###  Start installation
 # Add geneweb user
-groupadd ${GW_GROUP} \
-          -g ${GW_GID}
+groupadd {{ GW_GROUP }} \
+          -g {{ GW_GID }}
 
-useradd ${GW_USER} \
-        -u ${GW_UID} \
-        -g ${GW_GROUP} \
-        -m -d ${GW_ROOT} \
+useradd {{ GW_USER }} \
+        -u {{ GW_UID }} \
+        -g {{ GW_GROUP }} \
+        -m -d {{ GW_ROOT }} \
+        --system \
         -s /bin/bash
 
 pwck -s
@@ -52,8 +56,15 @@ apt-get install -y \
         libipc-system-simple-perl \
         libstring-shellquote-perl \
         m4 \
-        opam \
-        vim
+        make \
+        ocaml \
+        procps \
+        rsync \
+        wget \
+        unzip
+
+apt-get install -y \
+        opam
 
 # make geneweb
 opam init -c 4.12.1
@@ -77,45 +88,46 @@ opam install -y \
      uutf \
      uunf
 
+# make geneweb
 cd /tmp/
 git clone \
     --depth=1 \
     --no-single-branch \
     https://github.com/geneweb/geneweb
 cd geneweb/
-git checkout Geneweb-$GW_PR
+git checkout Geneweb-{{ GW_PR }}
 
 ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release
 make distrib
 
-chown -cR ${GW_USER}.${GW_GROUP} ${GW_ROOT}
+chown -cR {{ GW_USER }}.{{ GW_GROUP }} {{ GW_ROOT }}
 
-su - ${GW_USER}
-cd ${GW_ROOT}
+su - {{ GW_USER }}
+cd {{ GW_ROOT }}
 
 ###############################################################################
 %environment
-export GW_VER=7.0.0
-export GW_PR=48a588f8
-export GW_USER=geneweb
-export GW_GROUP=geneweb
-export GW_UID=115
-export GW_GID=115
-export GW_ROOT=/opt/geneweb
-export GWD_PORT=2317
-export GWSETUP_PORT=2316
+   export GW_VER={{ GW_VER }}
+   export GW_PR={{ GW_PR }}
+   export GW_USER={{ GW_USER }}
+   export GW_GROUP={{ GW_GROUP }}
+   export GW_UID={{ GW_UID }}
+   export GW_GID={{ GW_GID }}
+   export GW_ROOT={{ GW_ROOT }}
+   export GWD_PORT={{ GWD_PORT }}
+   export GWC_PORT={{ GWC_PORT }}
+   export PATH={{ GW_ROOT }}/gw/:$PATH
 
 ###############################################################################
 %runscript
-cd ${GW_ROOT}
-#/opt/geneweb/startup.sh "$@"
+   cd {{ GW_ROOT }}
+#  {{ GW_ROOT }}/startup.sh "$@"
 
 ###############################################################################
 %startscript
-cd ${GW_ROOT}
-/opt/geneweb/gwd -help
+   cd {{ GW_ROOT }}
+   {{ GW_ROOT }}/gw/gwd -version
 
 ###############################################################################
 %test
-# curl -s --fail http://localhost:2317 -o /dev/null
-# /opt/geneweb/startup.sh help
+   {{ GW_ROOT }}/gw/gwd -version
