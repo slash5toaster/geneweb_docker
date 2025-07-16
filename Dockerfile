@@ -36,13 +36,13 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
             ocaml \
             procps \
             rsync \
+            tini \
             unzip \
             wget
 
 # make geneweb
 WORKDIR /tmp/
 
-# https://github.com/geneweb/geneweb/releases/download/Geneweb-1eaac340/geneweb-linux-1eaac340.zip
 # https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/geneweb-linux-${GW_PR}.zip \
 RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
        cd /tmp/build/ \
@@ -51,7 +51,7 @@ RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
             -c https://github.com/geneweb/geneweb/releases/download/${GW_VER}/geneweb-linux.zip \
             -O /tmp/build/geneweb-linux-${GW_VER}.zip \
     && unzip /tmp/build/geneweb-linux-${GW_VER}.zip -d "${GW_ROOT}" \
-    && mkdir -vp ${GW_ROOT} ${GW_ROOT}/logs 
+    && mkdir -vp ${GW_ROOT} ${GW_ROOT}/logs
 
 COPY opt/geneweb/startup.sh ${GW_ROOT}
 COPY opt/geneweb/bashrc ${GW_ROOT}/.bashrc
