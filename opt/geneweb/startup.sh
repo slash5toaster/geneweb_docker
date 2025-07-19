@@ -112,17 +112,13 @@ status()
 get_help()
 {
   # test to make sure everything is copacetic
-
-  if [[ -e ${GW_ROOT}/gwd && -e ${GW_ROOT}/gwsetup ]]; then
-        echo "parameters start|setup|stop|restart|status|help "
-        echo "Will start with: "
-        echo
-        echo " ${GW_ROOT}/gwd ${GWD_OPTS}"
-        echo " ${GW_ROOT}/gwsetup ${GWS_OPTS}"
-        echo
-        echo "To change parameters, export GWD_OPTS and GWS_OPTS"
-  fi
-
+  echo "parameters start|setup|stop|restart|status|help "
+  echo "Will start with: "
+  echo
+  echo " ${GW_ROOT}/gw/gwd ${GWD_OPTS}"
+  echo " ${GW_ROOT}/gw/gwsetup ${GWS_OPTS}"
+  echo
+  echo "To change parameters, export GWD_OPTS and GWS_OPTS"
 }
 #=============================================================================
 
@@ -152,11 +148,11 @@ elif [[ $1 == "restart" ]]; then
 elif [[ $1 == "status" ]]; then
   status
 
-elif [[ $1 == "bash" ]]; then
-  /usr/bin/env bash
-
 elif [[ $1 == "help" ]]; then
   get_help
+
+elif [[ $1 == "bash" ]]; then
+  /usr/bin/env bash
 
 else
   "$@"
