@@ -72,7 +72,7 @@ wget -c https://github.com/geneweb/geneweb/releases/download/{{ GW_VER }}/genewe
   && mv -v {{ GW_ROOT }}/* {{ GW_ROOT }} \
   && rm -v /tmp/geneweb-linux-{{ GW_VER }}.zip
 
-chown -cR {{ GW_USER }}.{{ GW_GROUP }} {{ GW_ROOT }}
+chown -cR {{ GW_USER }}:{{ GW_GROUP }} {{ GW_ROOT }}
 
 su - {{ GW_USER }}
 cd {{ GW_ROOT }}
@@ -88,6 +88,7 @@ export GW_GID={{ GW_GID }}
 export GW_ROOT={{ GW_ROOT }}
 export GWD_PORT={{ GWD_PORT }}
 export GWC_PORT={{ GWC_PORT }}
+export PATH=$GW_ROOT:$GW_ROOT/gw:$PATH
 
 ###############################################################################
 %runscript

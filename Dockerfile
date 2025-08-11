@@ -62,6 +62,8 @@ RUN chown -cR ${GW_USER}:${GW_GROUP} ${GW_ROOT} \
 USER ${GW_USER}
 WORKDIR ${GW_ROOT}
 
+ENV PATH="${GW_ROOT}:${GW_ROOT}:${PATH}"
+
 EXPOSE ${GWD_PORT} \
        ${GWC_PORT} \
        ${HTTP_PORT} \
