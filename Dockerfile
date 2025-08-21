@@ -74,8 +74,8 @@ HEALTHCHECK --interval=5m \
             --start-period=30s \
   CMD curl -s --fail http://localhost:2317 -o /dev/null
 
-ENTRYPOINT [ "/usr/bin/tini", "--" ]
-CMD [ "sh", "-c", "/opt/geneweb/startup.sh", "$@" ]
+# ENTRYPOINT [ "/usr/bin/tini", "--" ]
+ENTRYPOINT [ "/bin/bash", "-c", "/opt/geneweb/startup.sh", "$@" ]
 
 # Mandatory Labels
 LABEL org.opencontainers.image.vendor=slash5toaster \
