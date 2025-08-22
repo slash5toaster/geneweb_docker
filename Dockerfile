@@ -115,7 +115,7 @@ RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
  && eval $(opam env) \
  && opam exec -- ocaml ./configure.ml --release \
  && opam exec -- make distrib \
- && rsync -azv /tmp/build/geneweb/distribution/ /opt/geneweb/ \
+ && rsync -azv /tmp/build/geneweb/distribution/ /opt/geneweb/
 
 COPY opt/geneweb/startup.sh ${GW_ROOT}
 COPY opt/geneweb/bashrc ${GW_ROOT}/.bashrc
