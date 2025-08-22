@@ -1,5 +1,8 @@
 FROM debian:unstable-slim
 
+ENV DEBIAN_FRONTEND=noninteractive
+RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+
 ARG GW_VER \
     GW_PR \
     GW_USER=geneweb \
@@ -29,8 +32,8 @@ RUN pwck -s \
 # Update OS to apply latest vulnerability fix
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get update && \
-    apt-get install -y \
+       apt-get update \
+ && apt-get install -y \
             curl \
             git \
             ocaml \
@@ -46,12 +49,12 @@ WORKDIR /tmp/
 # https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/geneweb-linux-${GW_PR}.zip \
 RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
        cd /tmp/build/ \
-    && ls /tmp/build/ \
-    && wget --progress=dot:giga \
-            -c https://github.com/geneweb/geneweb/releases/download/${GW_VER}/geneweb-linux.zip \
-            -O /tmp/build/geneweb-linux-${GW_VER}.zip \
-    && unzip /tmp/build/geneweb-linux-${GW_VER}.zip -d "${GW_ROOT}" \
-    && mkdir -vp ${GW_ROOT} ${GW_ROOT}/logs
+ && ls /tmp/build/ \
+ && wget --progress=dot:giga \
+         -c https://github.com/geneweb/geneweb/releases/download/${GW_VER}/geneweb-linux.zip \
+         -O /tmp/build/geneweb-linux-${GW_VER}.zip \
+ && unzip /tmp/build/geneweb-linux-${GW_VER}.zip -d "${GW_ROOT}" \
+ && mkdir -vp ${GW_ROOT} ${GW_ROOT}/logs
 
 COPY opt/geneweb/startup.sh ${GW_ROOT}
 COPY opt/geneweb/bashrc ${GW_ROOT}/.bashrc
@@ -81,6 +84,6 @@ ENTRYPOINT [ "/bin/bash", "-c", "/opt/geneweb/startup.sh", "$@" ]
 LABEL org.opencontainers.image.vendor=slash5toaster \
       org.opencontainers.image.authors="slash5toaster@gmail.com" \
       org.opencontainers.image.ref.name=geneweb \
-      org.opencontainers.image.version=7.1.0-beta
+      org.opencontainers.image.version=7.1.0-beta-pb
 
 #### End of File, if this is missing the file has been truncated

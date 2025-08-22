@@ -79,7 +79,7 @@ cd {{ GW_ROOT }}
 
 ###############################################################################
 %environment
-export GW_VER={{ GW_VER }}
+export GW_VER={{ GW_VER }}      
 export GW_PR={{ GW_PR }}
 export GW_USER={{ GW_USER }}
 export GW_GROUP={{ GW_GROUP }}
