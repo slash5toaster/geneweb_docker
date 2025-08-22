@@ -7,7 +7,7 @@ GWC_PORT ?= 2316
 
 GW_ROOT ?= /opt/geneweb
 
-GW_PR ?= 2ab85d8 
+GW_PR ?= 2ab85d8
 GW_VER ?= v7.1-beta
 
 GW_USER ?= geneweb
@@ -15,8 +15,8 @@ GW_GROUP ?= geneweb
 GW_UID ?= 115
 GW_GID ?= 115
 
-OCAML_VER ?= 4.14.2
-OPAM_VER ?= 2.1.5
+OCAML_VER ?= 5.3.0
+OPAM_VER ?= 2.4.1
 
 # Date for log files
 LOGDATE := $(shell date +%F-%H%M)
