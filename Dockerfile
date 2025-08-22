@@ -16,23 +16,25 @@ ARG GW_VER \
 
 ENV GW_ROOT=/opt/geneweb \
     GWD_PORT=2317 \
-    GWSETUP_PORT=2316 \
+    GWC_PORT=2316 \
     HTTP_PORT=80 \
     HTTPS_PORT=443
 
 # Add geneweb user
 RUN groupadd ${GW_GROUP} \
-          -g ${GW_GID} \
- && useradd ${GW_USER} \
+          -g ${GW_GID}
+RUN useradd ${GW_USER} \
          -u ${GW_UID} \
          -g ${GW_GROUP} \
          -m -d ${GW_ROOT} \
          --system \
          -l \
-         -s /bin/bash \
-  ; pwck -s \
+         -s /bin/bash
+
+RUN pwck -s \
   ; grpck -s
 
+# Update OS to apply latest vulnerability fix
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
        apt-get update \
@@ -114,17 +116,20 @@ RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
  && opam exec -- ocaml ./configure.ml --release \
  && opam exec -- make distrib \
  && rsync -azv /tmp/build/geneweb/distribution/ /opt/geneweb/ \
- && chown -cR ${GW_USER}:${GW_GROUP} /opt/geneweb/
 
-COPY opt/geneweb/startup.sh /opt/geneweb/startup.sh
-COPY opt/geneweb/bashrc /opt/geneweb/.bashrc
+COPY opt/geneweb/startup.sh ${GW_ROOT}
+COPY opt/geneweb/bashrc ${GW_ROOT}/.bashrc
 
-# make geneweb
+RUN chown -cR ${GW_USER}:${GW_GROUP} ${GW_ROOT} \
+ && chmod -c +x ${GW_ROOT}/startup.sh
+
 USER ${GW_USER}
 WORKDIR ${GW_ROOT}
 
+ENV PATH="${GW_ROOT}:${GW_ROOT}:${PATH}"
+
 EXPOSE ${GWD_PORT} \
-       ${GWSETUP_PORT} \
+       ${GWC_PORT} \
        ${HTTP_PORT} \
        ${HTTPS_PORT}
 

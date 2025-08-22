@@ -2,11 +2,19 @@ SHELL := /usr/bin/env bash
 
 # Docker repository for tagging and publishing
 DOCKER_REPO ?= localhost
-GW_PORT ?= 2317
+GWD_PORT ?= 2317
 GWC_PORT ?= 2316
+
 GW_ROOT ?= /opt/geneweb
-GW_PR ?= 2ab85d8
+
+GW_PR ?= 2ab85d8 
 GW_VER ?= v7.1-beta
+
+GW_USER ?= geneweb
+GW_GROUP ?= geneweb
+GW_UID ?= 115
+GW_GID ?= 115
+
 OCAML_VER ?= 4.14.2
 OPAM_VER ?= 2.1.5
 
@@ -53,7 +61,7 @@ docker: ## Build the docker image locally.
 		-t $(CONTAINER_STRING) \
 		--cache-from $(CONTAINER_STRING) \
 		--build-arg GW_ROOT=$(GW_ROOT) \
-		--build-arg GW_PORT=$(GW_PORT) \
+		--build-arg GWD_PORT=$(GWD_PORT) \
 		--build-arg GWC_PORT=$(GWC_PORT) \
 		--build-arg GW_PR=$(GW_PR) \
 		--build-arg GW_VER=$(GW_VER) \
@@ -75,7 +83,7 @@ docker-multi: ## Multi-platform build.
 		-t $(CONTAINER_STRING) \
 		--cache-from $(CONTAINER_STRING) \
 		--build-arg GW_ROOT=$(GW_ROOT) \
-		--build-arg GW_PORT=$(GW_PORT) \
+		--build-arg GWD_PORT=$(GWD_PORT) \
 		--build-arg GWC_PORT=$(GWC_PORT) \
 		--build-arg GW_PR=$(GW_PR) \
 		--build-arg GW_VER=$(GW_VER) \
@@ -84,7 +92,8 @@ docker-multi: ## Multi-platform build.
 		--label org.opencontainers.image.created=$(LOGDATE) \
 		--progress plain \
 		--push 2>&1 \
-	| tee source/logs/build-multi-$(CONTAINER_PROJECT)-$(CONTAINER_NAME)_$(CONTAINER_TAG)-$(LOGDATE).log
+	| tee source/logs/build-$(CONTAINER_PROJECT)-$(CONTAINER_NAME)_$(CONTAINER_TAG)-$(LOGDATE).log ;\
+	docker inspect $(CONTAINER_STRING) > source/logs/inspect-$(CONTAINER_PROJECT)-$(CONTAINER_NAME)_$(CONTAINER_TAG)-$(LOGDATE).log
 
 destroy: ## obliterate the local image
 	[ "${C_IMAGES}" == "" ] || \
@@ -92,13 +101,20 @@ destroy: ## obliterate the local image
 
 apptainer: ## Build an apptainer sif image directly
 	apptainer build \
-                --build-arg GW_PR=$(GW_PR) \
-                --build-arg GW_VER=$(GW_VER) \
+		--build-arg GW_VER=$(GW_VER) \
+		--build-arg GW_PR=$(GW_PR) \
+		--build-arg GWC_PORT=$(GWC_PORT) \
+		--build-arg GWD_PORT=$(GWD_PORT) \
+		--build-arg GW_ROOT=$(GW_ROOT) \
+		--build-arg GW_GROUP=$(GW_GROUP) \
+		--build-arg GW_GID=$(GW_GID) \
+		--build-arg GW_USER=$(GW_USER) \
+		--build-arg GW_UID=$(GW_UID) \
             /tmp/$(CONTAINER_NAME)_$(GW_VER).sif geneweb.def
 
 run: ## run the image
 	[ "${C_IMAGES}" ] || \
-		make local
+		make docker
 	[ "${C_ID}" ] || \
 	docker run \
 		--rm \
@@ -108,7 +124,7 @@ run: ## run the image
 		-v "$(shell pwd)/source/bases/":$(GW_ROOT)/bases/ \
 		--name $(CONTAINER_NAME) \
 		--hostname=$(CONTAINER_NAME)-$(CONTAINER_TAG) \
-		--publish $(GW_PORT):$(GW_PORT) \
+		--publish $(GWD_PORT):$(GWD_PORT) \
 		--publish $(GWC_PORT):$(GWC_PORT) \
 		$(CONTAINER_STRING)
 
@@ -129,7 +145,7 @@ kill: ## shutdown
 
 publish: ## Push server image to remote
 	[ "${C_IMAGES}" ] || \
-		make local
+		make docker
 	@echo 'pushing $(CONTAINER_STRING) to $(DOCKER_REPO)'
 	docker push $(CONTAINER_STRING)
 

@@ -9,21 +9,20 @@ GW_ROOT=${GW_ROOT:="/opt/geneweb"}
 GW_BASES=${GW_BASES:="${GW_ROOT}/bases/"}
 GW_LOGDIR=${GW_LOGDIR:="${GW_ROOT}/logs"}
 GWD_PORT=${GWD_PORT:="2317"}
-GWSETUP_PORT=${GWSETUP_PORT:="2316"}
+GWC_PORT=${GWC_PORT:="2316"}
 
 # default options - this can be overridden by setting environment vars
 
 GWD_OPTS=${GWD_OPTS:=" -lang ${GW_LANG} \
-                       -blang \
                        -log ${GW_LOGDIR}/gwd.log \
                        -p $GWD_PORT \
                        -bd ${GW_BASES}
                        "}
 GWS_OPTS=${GWS_OPTS:=" -lang ${GW_LANG} \
                        -bd ${GW_BASES} \
+                       -gd ${GW_ROOT}/gw \
                        -only ${GW_BASES}/only.txt \
-                       -p $GWSETUP_PORT
-                       -gwd_p $GWD_PORT
+                       -p $GWC_PORT
                        "}
 #make clean
 GWD_OPTS=$(echo ${GWD_OPTS} | tr -s '[[:blank:]]')
@@ -66,7 +65,7 @@ start()
     echo "gwd running as $(pgrep -a gwd)"
   else
     echo "Starting Geneweb"
-    test -e ${GW_LOGDIR}/gwd.log && mv ${GW_LOGDIR}/gwd.log.old
+    test -e ${GW_LOGDIR}/gwd.log && mv ${GW_LOGDIR}/gwd.log ${GW_LOGDIR}/gwd.log.old
 
     ${GW_ROOT}/gw/gwd ${GWD_OPTS}
   fi
@@ -78,7 +77,8 @@ launch_setup()
   if [[ $(pgrep gwsetup) ]]; then
       echo "gwsetup running as $(pgrep -a setup)"
   else
-    ${GW_ROOT}/gwsetup ${GWS_OPTS}
+    cd ${GW_ROOT}/bases/
+    ${GW_ROOT}/gw/gwsetup ${GWS_OPTS}
   fi
 }
 #=============================================================================
@@ -112,17 +112,13 @@ status()
 get_help()
 {
   # test to make sure everything is copacetic
-
-  if [[ -e ${GW_ROOT}/gwd && -e ${GW_ROOT}/gwsetup ]]; then
-        echo "parameters start|setup|stop|restart|status|help "
-        echo "Will start with: "
-        echo
-        echo " ${GW_ROOT}/gwd ${GWD_OPTS}"
-        echo " ${GW_ROOT}/gwsetup ${GWS_OPTS}"
-        echo
-        echo "To change parameters, export GWD_OPTS and GWS_OPTS"
-  fi
-
+  echo "parameters start|setup|stop|restart|status|help "
+  echo "Will start with: "
+  echo
+  echo " ${GW_ROOT}/gw/gwd ${GWD_OPTS}"
+  echo " ${GW_ROOT}/gw/gwsetup ${GWS_OPTS}"
+  echo
+  echo "To change parameters, export GWD_OPTS and GWS_OPTS"
 }
 #=============================================================================
 
@@ -152,11 +148,11 @@ elif [[ $1 == "restart" ]]; then
 elif [[ $1 == "status" ]]; then
   status
 
-elif [[ $1 == "bash" ]]; then
-  /usr/bin/env bash
-
 elif [[ $1 == "help" ]]; then
   get_help
+
+elif [[ $1 == "bash" ]]; then
+  /usr/bin/env bash
 
 else
   "$@"
