@@ -107,7 +107,7 @@ RUN opam -y init --compiler=${OCAML_VER} \
  && opam list
 
 RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
-    cd /tmp/build/ \ 
+    cd /tmp/build/ \
  && (test -e /tmp/build/geneweb/.git || git clone --depth=1 --no-single-branch https://github.com/geneweb/geneweb /tmp/build/geneweb) \
  && cd /tmp/build/geneweb \
  && ls -l \

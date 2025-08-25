@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x 
+set -x
 set -o pipefail
 
 TARGETARCH=${TARGETARCH:-$1}
@@ -10,16 +10,21 @@ if [[ -z ${TARGETARCH} ]]; then
     exit 2
 fi
 
+if [[ -z ${TARGETOS} ]]; then
+    TARGETOS=$( uname -s | tr "[:upper:]" "[:lower:]") \
+    || exit 2
+fi
+
 # this converts the $TARGETARCH from a dockerfile to do the correct actions
 case $TARGETARCH in
     aarch)
         MYARCH="macos"
     ;;
-    
+
     amd64)
         MYARCH="x86_64"
     ;;
-    
+
     *)
         MYARCH=$TARGETARCH
     ;;
