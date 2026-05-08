@@ -76,9 +76,9 @@ envs: ## show the environments
 sif: ## Build a sif image directly
 	mkdir -vp  source/logs/ ; \
 	$(APPTAINER_BIN) build \
-            --build-arg CALIBRE_VERSION=$(CALIBRE_VERSION) \
+            --build-arg GW_VER=$(GW_VER) \
             -F source/$(CONTAINER_NAME)_$(CONTAINER_TAG).sif \
-            calibre.def \
+            geneweb.def \
 	| tee source/logs/sif-build-$(shell date +%F-%H%M).log
 
 # Build docker/OCI container locally
