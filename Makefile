@@ -67,7 +67,7 @@ envs: ## show the environments
 	$(info Project          - ${CONTAINER_PROJECT})
 	$(info Name             - ${CONTAINER_NAME})
 	$(info Tag is           - ${CONTAINER_TAG})
-	$(info Version is       - ${CALIBRE_VERSION})
+	$(info Version is       - ${GW_VER})
 	$(info Apptainer is     - ${APPTAINER_BIN})
 	$(info Docker is        - ${DOCKER_BIN})
 
