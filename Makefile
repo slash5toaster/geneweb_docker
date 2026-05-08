@@ -10,8 +10,8 @@ APPTAINER_BIN := $(shell type -p apptainer || type -p apptainer.lima || type -p 
 
 GW_ROOT ?= /opt/geneweb
 
-GW_PR ?= 2ab85d8 
-GW_VER ?= v7.1-beta
+GW_PR ?= 2115f6a
+GW_VER ?= v7.1.0-beta2
 
 GW_USER ?= geneweb
 GW_GROUP ?= geneweb
