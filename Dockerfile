@@ -51,7 +51,7 @@ RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
        cd /tmp/build/ \
  && ls /tmp/build/ \
  && wget --progress=dot:giga \
-         -c https://github.com/geneweb/geneweb/releases/download/v${GW_VER}/geneweb=${GW_VER}-linux.zip \
+         -c https://github.com/geneweb/geneweb/releases/download/v${GW_VER}/geneweb-${GW_VER}-linux.zip \
          -O /tmp/build/geneweb-linux-${GW_VER}.zip \
  && unzip /tmp/build/geneweb-linux-${GW_VER}.zip -d "${GW_ROOT}" \
  && mkdir -vp ${GW_ROOT} ${GW_ROOT}/logs

@@ -105,4 +105,4 @@ cd {{ GW_ROOT }}
 
 ###############################################################################
 %test
-   test -e {{ GW_ROOT }}/gw/gwd
+   sudo -u {{ GW_USER }} {{ GW_ROOT }}/gw/gwd -version
