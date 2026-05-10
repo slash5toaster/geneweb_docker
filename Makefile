@@ -11,7 +11,7 @@ APPTAINER_BIN := $(shell type -p apptainer || type -p apptainer.lima || type -p 
 GW_ROOT ?= /opt/geneweb
 
 GW_PR ?= 2115f6a
-GW_VER ?= v7.1.0-beta2
+GW_VER ?= 7.1.0-beta2
 
 GW_USER ?= geneweb
 GW_GROUP ?= geneweb
@@ -76,28 +76,38 @@ envs: ## show the environments
 sif: ## Build a sif image directly
 	mkdir -vp  source/logs/ ; \
 	$(APPTAINER_BIN) build \
-            --build-arg GW_VER=$(GW_VER) \
-            -F source/$(CONTAINER_NAME)_$(CONTAINER_TAG).sif \
-            geneweb.def \
-	| tee source/logs/sif-build-$(shell date +%F-%H%M).log
+		--build-arg GW_VER=$(GW_VER) \
+		--build-arg GW_PR=$(GW_PR) \
+		--build-arg GWC_PORT=$(GWC_PORT) \
+		--build-arg GWD_PORT=$(GWD_PORT) \
+		--build-arg GW_ROOT=$(GW_ROOT) \
+		--build-arg GW_GROUP=$(GW_GROUP) \
+		--build-arg GW_GID=$(GW_GID) \
+		--build-arg GW_USER=$(GW_USER) \
+		--build-arg GW_UID=$(GW_UID) \
+        -F source/$(CONTAINER_NAME)_$(CONTAINER_TAG).sif \
+        geneweb.def \
+	| tee source/logs/sif-build-$(LOGDATE).log
 
 # Build docker/OCI container locally
 #
 docker: ## Build the docker image locally.
 	$(call run_hadolint)
-	git pull --recurse-submodules;\
 	mkdir -vp source/logs/ ; \
 	DOCKER_BUILDKIT=1 \
 	$(DOCKER_BIN) $(BUILD_CMD) \
 		-t $(CONTAINER_STRING) \
-		--cache-from $(CONTAINER_STRING) \
-		--build-arg GW_ROOT=$(GW_ROOT) \
-		--build-arg GWD_PORT=$(GWD_PORT) \
-		--build-arg GWC_PORT=$(GWC_PORT) \
-		--build-arg GW_PR=$(GW_PR) \
 		--build-arg GW_VER=$(GW_VER) \
+		--build-arg GW_PR=$(GW_PR) \
+		--build-arg GWC_PORT=$(GWC_PORT) \
+		--build-arg GWD_PORT=$(GWD_PORT) \
+		--build-arg GW_ROOT=$(GW_ROOT) \
+		--build-arg GW_GROUP=$(GW_GROUP) \
+		--build-arg GW_GID=$(GW_GID) \
+		--build-arg GW_USER=$(GW_USER) \
+		--build-arg GW_UID=$(GW_UID) \
 		--progress plain \
-		--label org.opencontainers.image.created=$(shell date +%F-%H%M) 2>&1 \
+		--label org.opencontainers.image.created=$(LOGDATE) 2>&1 \
 		-f Dockerfile . \
 	| tee source/logs/build-$(CONTAINER_PROJECT)-$(CONTAINER_NAME)_$(CONTAINER_TAG)-$(LOGDATE).log ;\
 	$(DOCKER_BIN) inspect $(CONTAINER_STRING) > source/logs/inspect-$(CONTAINER_PROJECT)-$(CONTAINER_NAME)_$(CONTAINER_TAG)-$(LOGDATE).log
@@ -129,19 +139,6 @@ destroy: ## obliterate the local image
 		$(DOCKER_BIN) rmi  $(CONTAINER_PROJECT)/$(CONTAINER_NAME):latest; \
 	fi
 
-apptainer: ## Build an apptainer sif image directly
-	apptainer build \
-		--build-arg GW_VER=$(GW_VER) \
-		--build-arg GW_PR=$(GW_PR) \
-		--build-arg GWC_PORT=$(GWC_PORT) \
-		--build-arg GWD_PORT=$(GWD_PORT) \
-		--build-arg GW_ROOT=$(GW_ROOT) \
-		--build-arg GW_GROUP=$(GW_GROUP) \
-		--build-arg GW_GID=$(GW_GID) \
-		--build-arg GW_USER=$(GW_USER) \
-		--build-arg GW_UID=$(GW_UID) \
-            /tmp/$(CONTAINER_NAME)_$(GW_VER).sif geneweb.def
-
 run: ## launch shell into the container, with this directory mounted to /opt/devel/
 	[ "${C_IMAGES}" ] || \
 		make docker
@@ -154,25 +151,10 @@ run: ## launch shell into the container, with this directory mounted to /opt/dev
 		-v "$(shell pwd)":/opt/devel \
 		-v "$(shell pwd)/source/bases/":$(GW_ROOT)/bases/ \
 		--name $(CONTAINER_NAME) \
-          --hostname=$(CONTAINER_NAME) \
+        --hostname=$(CONTAINER_NAME) \
 		--publish $(GWD_PORT):$(GWD_PORT) \
 		--publish $(GWC_PORT):$(GWC_PORT) \
           $(CONTAINER_STRING)
-
-shell: run ## shell in server image.
-	[ "${C_ID}" ] || \
-		make run
-	docker exec \
-		-it \
-		-e DEBUG=0 \
-		-e TZ=PST8PDT \
-		--user root:root \
-		$(CONTAINER_NAME) /bin/bash
-
-kill: ## shutdown
-	[ "${C_ID}" ] || \
-	docker kill $(CONTAINER_NAME) && \
-	docker rm $(CONTAINER_NAME)
 
 publish: ## Push server image to remote, if on main, publish latest tag
 	[ "${C_IMAGES}" ] || \

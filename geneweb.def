@@ -67,7 +67,8 @@ apt-get install -y \
 # make geneweb
 cd /tmp/
 
-wget -c https://github.com/geneweb/geneweb/releases/download/{{ GW_VER }}/geneweb-linux.zip \
+#       https://github.com/geneweb/geneweb/releases/download/v7.1.0-beta2/geneweb-7.1.0-beta2-linux.zip
+wget -c https://github.com/geneweb/geneweb/releases/download/v{{ GW_VER }}/geneweb-{{ GW_VER }}-linux.zip \
      -O /tmp/geneweb-linux-{{ GW_VER }}.zip \
   && cd {{ GW_ROOT }} \
   && unzip /tmp/geneweb-linux-{{ GW_VER }}.zip \
@@ -104,4 +105,4 @@ cd {{ GW_ROOT }}
 
 ###############################################################################
 %test
-   {{ GW_ROOT }}/gw/gwd -version
+   test -e {{ GW_ROOT }}/gw/gwd

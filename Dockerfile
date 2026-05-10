@@ -46,12 +46,12 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # make geneweb
 WORKDIR /tmp/
 
-# https://github.com/geneweb/geneweb/releases/download/Geneweb-${GW_PR}/geneweb-linux-${GW_PR}.zip \
+#           https://github.com/geneweb/geneweb/releases/download/v7.1.0-beta2/geneweb-7.1.0-beta2-linux.zip
 RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
        cd /tmp/build/ \
  && ls /tmp/build/ \
  && wget --progress=dot:giga \
-         -c https://github.com/geneweb/geneweb/releases/download/${GW_VER}/geneweb-linux.zip \
+         -c https://github.com/geneweb/geneweb/releases/download/v${GW_VER}/geneweb=${GW_VER}-linux.zip \
          -O /tmp/build/geneweb-linux-${GW_VER}.zip \
  && unzip /tmp/build/geneweb-linux-${GW_VER}.zip -d "${GW_ROOT}" \
  && mkdir -vp ${GW_ROOT} ${GW_ROOT}/logs
@@ -75,7 +75,7 @@ EXPOSE ${GWD_PORT} \
 HEALTHCHECK --interval=5m \
             --timeout=3s \
             --start-period=30s \
-  CMD curl -s --fail http://localhost:2317 -o /dev/null
+  CMD curl -s --fail http://localhost:${GWD_PORT} -o /dev/null
 
 # ENTRYPOINT [ "/usr/bin/tini", "--" ]
 ENTRYPOINT [ "/bin/bash", "-c", "/opt/geneweb/startup.sh", "$@" ]
@@ -84,6 +84,6 @@ ENTRYPOINT [ "/bin/bash", "-c", "/opt/geneweb/startup.sh", "$@" ]
 LABEL org.opencontainers.image.vendor=slash5toaster \
       org.opencontainers.image.authors="slash5toaster@gmail.com" \
       org.opencontainers.image.ref.name=geneweb \
-      org.opencontainers.image.version=7.1.0-beta-pb
+      org.opencontainers.image.version=7.1.0-beta2-pb
 
 #### End of File, if this is missing the file has been truncated
