@@ -44,6 +44,7 @@ pwck -s
 grpck -s
 
 # Update OS to apply latest vulnerability fix
+DEBIAN_FRONTEND=noninteractive \
 apt-get update && \
 apt-get install -y \
         bubblewrap \
@@ -96,13 +97,14 @@ cd {{ GW_ROOT }}
 ###############################################################################
 %runscript
    cd {{ GW_ROOT }}
-#  {{ GW_ROOT }}/startup.sh "$@"
+   {{ GW_ROOT }}/startup.sh "$@"
 
 ###############################################################################
 %startscript
    cd {{ GW_ROOT }}
-   {{ GW_ROOT }}/gw/gwd -version
+   {{ GW_ROOT }}/startup.sh "$@"
 
 ###############################################################################
 %test
-   sudo -u {{ GW_USER }} {{ GW_ROOT }}/gw/gwd -version
+   su - {{ GW_USER }} -c {{ GW_ROOT }}/gwd --help
+   su - {{ GW_USER }} -c {{ GW_ROOT }}/gwsetup --help

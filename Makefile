@@ -86,7 +86,7 @@ sif: ## Build a sif image directly
 		--build-arg GW_USER=$(GW_USER) \
 		--build-arg GW_UID=$(GW_UID) \
         -F source/$(CONTAINER_NAME)_$(CONTAINER_TAG).sif \
-        geneweb.def \
+        geneweb.def 2>&1 \
 	| tee source/logs/sif-build-$(LOGDATE).log
 
 # Build docker/OCI container locally
