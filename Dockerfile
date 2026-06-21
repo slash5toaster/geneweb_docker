@@ -1,4 +1,4 @@
-FROM debian:unstable-slim
+FROM --platform=$BUILDPLATFORM debian:unstable-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
@@ -67,6 +67,8 @@ WORKDIR ${GW_ROOT}
 
 ENV PATH="${GW_ROOT}:${GW_ROOT}:${PATH}"
 
+RUN ${GW_ROOT}/gw --version
+
 EXPOSE ${GWD_PORT} \
        ${GWC_PORT} \
        ${HTTP_PORT} \
@@ -77,7 +79,6 @@ HEALTHCHECK --interval=5m \
             --start-period=30s \
   CMD curl -s --fail http://localhost:${GWD_PORT} -o /dev/null
 
-# ENTRYPOINT [ "/usr/bin/tini", "--" ]
 ENTRYPOINT [ "/bin/bash", "-c", "/opt/geneweb/startup.sh", "$@" ]
 
 # Mandatory Labels
