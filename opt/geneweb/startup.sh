@@ -19,6 +19,7 @@ GWD_OPTS=${GWD_OPTS:=" -lang ${GW_LANG} \
                        -bd ${GW_BASES}
                        "}
 GWS_OPTS=${GWS_OPTS:=" -lang ${GW_LANG} \
+                       -daemon \
                        -bd ${GW_BASES} \
                        -gd ${GW_ROOT}/gw \
                        -only ${GW_BASES}/only.txt \
