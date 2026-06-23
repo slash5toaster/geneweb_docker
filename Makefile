@@ -7,12 +7,10 @@ GWC_PORT ?= 2316
 DOCKER_BIN := $(shell type -p docker || type -p nerdctl || type -p nerdctl.lima || exit)
 APPTAINER_BIN := $(shell type -p apptainer || type -p apptainer.lima || type -p singularity || exit)
 
-
-GW_ROOT ?= /opt/geneweb
-
 GW_PR ?= 2ab85d8
 GW_VER ?= v7.1-beta
 
+GW_ROOT ?= /opt/geneweb
 GW_USER ?= geneweb
 GW_GROUP ?= geneweb
 GW_UID ?= 115
@@ -53,7 +51,6 @@ else
     BUILD_CMD = build
 endif
 
-
 # HELP
 # https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 .PHONY: help
@@ -88,6 +85,8 @@ sif: ## Build a sif image directly
 		--build-arg GW_GID=$(GW_GID) \
 		--build-arg GW_USER=$(GW_USER) \
 		--build-arg GW_UID=$(GW_UID) \
+		--build-arg OCAML_VER=$(OCAML_VER) \
+		--build-arg OPAM_VER=$(OPAM_VER) \
         -F source/$(CONTAINER_NAME)_$(CONTAINER_TAG).sif \
         geneweb.def 2>&1 \
 	| tee source/logs/sif-build-$(LOGDATE).log
@@ -150,15 +149,15 @@ run: ## launch shell into the container, with this directory mounted to /opt/dev
 	$(DOCKER_BIN) run \
           --rm \
           -it \
-		-e TZ=PST8PDT \
+		  -e TZ=PST8PDT \
           --entrypoint /bin/bash \
-		-v "$(shell pwd)":/opt/devel \
-		-v "$(shell pwd)/source/bases/":$(GW_ROOT)/bases/ \
-		--name $(CONTAINER_NAME) \
-        --hostname=$(CONTAINER_NAME) \
-		--publish $(GWD_PORT):$(GWD_PORT) \
-		--publish $(GWC_PORT):$(GWC_PORT) \
-          $(CONTAINER_STRING)
+		  -v "$(shell pwd)":/opt/devel \
+		  -v "$(shell pwd)/source/bases/":$(GW_ROOT)/bases/ \
+		  --name $(CONTAINER_NAME) \
+		  --hostname=$(CONTAINER_NAME) \
+		  --publish $(GWD_PORT):$(GWD_PORT) \
+		  --publish $(GWC_PORT):$(GWC_PORT) \
+		  $(CONTAINER_STRING)
 
 publish: ## Push server image to remote, if on main, publish latest tag
 	[ "${C_IMAGES}" ] || \
@@ -177,7 +176,7 @@ docker-lint: ## Check files for errors
 	$(call run_hadolint)
 
 # Commands for extracting information on the running container
-GET_IMAGES := $(DOCKER_BIN) images ${CONTAINER_STRING} --format "{{.ID}}"
+GET_IMAGES.   := $(DOCKER_BIN) images ${CONTAINER_STRING} --format "{{.ID}}"
 GET_CONTAINER := $(DOCKER_BIN) ps -a --filter "name=${CONTAINER_NAME}" --no-trunc
-GET_ID := ${GET_CONTAINER} --format {{.ID}}
-GET_STATUS := ${GET_CONTAINER} --format {{.Status}} | cut -d " " -f1
+GET_ID        := ${GET_CONTAINER} --format {{.ID}}
+GET_STATUS    := ${GET_CONTAINER} --format {{.Status}} | cut -d " " -f1
