@@ -60,7 +60,7 @@ wget -c \
     -O /tmp/opam.sig \
  && chmod -c +x /usr/bin/opam
 
-    opam -y init --compiler=${OCAML_VER} \
+       opam -y init --compiler=${OCAML_VER} \
     && eval $(opam env) \
     && opam install -y \
             calendars.1.0.0 \
@@ -81,7 +81,7 @@ wget -c \
             uucp \
             uutf \
             uunf
-    opam exec -- ocaml --version \
+       opam exec -- ocaml --version \
     && opam exec -- opam --version \
     && opam list
 

@@ -1,7 +1,4 @@
-FROM --platform=$BUILDPLATFORM debian:unstable-slim
-
-ENV DEBIAN_FRONTEND=noninteractive
-RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+FROM --platform=$BUILDPLATFORM ocaml/opam:debian-ocaml-4.14-nnp@sha256:6dd7a8b14d2d6dbdc5c0d7dcc5bb1bd1136d4b17abe12e9fece2464931bbf9f9 AS builder
 
 ARG GW_VER \
     GW_PR \
@@ -20,120 +17,115 @@ ENV GW_ROOT=/opt/geneweb \
     HTTP_PORT=80 \
     HTTPS_PORT=443
 
-# Add geneweb user
-RUN groupadd ${GW_GROUP} \
-          -g ${GW_GID}
-RUN useradd ${GW_USER} \
-         -u ${GW_UID} \
-         -g ${GW_GROUP} \
-         -m -d ${GW_ROOT} \
-         --system \
-         -l \
-         -s /bin/bash
+ENV OPAMYES=yes
+ENV OPAMJOBS=2
+ENV DUNE_PROFILE=release
+
+USER root
+# Install required system dependencies
+RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    export DEBIAN_FRONTEND=noninteractive \
+ && apt-get update \
+ && apt-get install -yq --no-install-recommends \
+            brotli \
+            libgmp-dev \
+            libipc-system-simple-perl \
+            libpcre2-dev \
+            m4 \
+            pkg-config \
+            xdot \
+            zlib1g-dev \
+ && ln -sf /usr/bin/opam-2.3 /usr/bin/opam
+
+# Update local opam repository
+USER opam
+WORKDIR /home/opam/opam-repository
+RUN git fetch origin master \
+ && git checkout b69889513d1dfe730791f2fffabe24ca1d944b5f \
+ && opam update
+
+# Initialize OPAM
+WORKDIR /home/opam
+RUN opam init --disable-sandboxing --auto-setup --bare
+
+# Copy opam file for dependency resolution then install dependencies
+COPY --chown=opam:opam *.opam ./
+RUN opam install . --deps-only --with-test \
+ && opam install ancient
+
+# Clone repository and build Geneweb
+WORKDIR /home/opam/geneweb
+COPY --chown=opam:opam . .
+RUN opam exec -- make distrib
+
+###############################################################################
+#                                       STAGE 2: Export build via blank image
+###############################################################################
+
+FROM scratch AS export
+COPY --from=builder /home/opam/geneweb/distribution /
+
+###############################################################################
+#                                              STAGE 3: Assemble Docker image
+###############################################################################
+
+FROM debian:unstable-slim AS container
+RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+
+ENV GENEWEB_HOME=/usr/local/share/geneweb
+ENV GENEWEB_DATA_PATH=${GENEWEB_HOME}/share/data
+ENV GWSETUP_IP=172.17.0.1
+
+# Install runtime tools and add Geneweb user
+# Ignore the apt warning here as apt-get does not allow wildcarding versions
+# hadolint ignore=DL3027
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update -q \
+ && apt install -qy --no-install-recommends openssl adduser netcat-openbsd \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/* \
+ && adduser \
+     --system \
+     --group \
+     --uid ${GW_UID} \
+     --home ${GENEWEB_HOME} \
+       --shell /bin/bash \
+       geneweb
 
 RUN pwck -s \
   ; grpck -s
 
-# Update OS to apply latest vulnerability fix
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-       apt-get update \
-    && apt-get install -y \
-            bubblewrap \
-            bzip2 \
-            curl \
-            gcc \
-            git \
-            libcurl4-gnutls-dev \
-            libgmp-dev \
-            libipc-system-simple-perl \
-            libstring-shellquote-perl \
-            m4 \
-            make \
-            procps \
-            rsync \
-            tini \
-            unzip \
-            vim \
-            wget \
-            xdot
+# Do everything in the Geneweb home directory
+WORKDIR ${GENEWEB_HOME}
 
-# manually install ocaml and opam
-# https://github.com/ocaml/ocaml/archive/refs/tags/4.14.2.zip
-# https://github.com/ocaml/opam/releases/download/2.1.5/opam-2.1.5-arm64-linux
-RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
-       cd /tmp/build/ \
- && ls /tmp/build/ \
- && wget --progress=dot:giga \
-         -c  https://github.com/ocaml/ocaml/archive/refs/tags/${OCAML_VER}.tar.gz \
-         -O /tmp/build/${OCAML_VER}.tar.gz \
- && tar -xzf /tmp/build/${OCAML_VER}.tar.gz \
- && cd /tmp/build/ocaml-${OCAML_VER}/ \
- && ./configure \
- && make clean \
- && make \
- && make install
+# Create directory structure and configure
+RUN mkdir -p bin etc log share/data share/dist \
+ && echo "${GWSETUP_IP}" >> etc/gwsetup_only
 
-# convert amd64 to x86_64
-COPY build/install_opam.sh /tmp/build/install_opam.sh
-RUN /tmp/build/install_opam.sh ${TARGETARCH}
+# Copy application files
+COPY --from=builder /home/opam/geneweb/distribution share/dist
+COPY docker/geneweb-launch.sh bin/geneweb-launch.sh
 
-RUN echo "test -r /root/.opam/opam-init/init.sh && . /root/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true" >> ~/.profile
+# Make script executable, ensure log files exists and update ownership
+RUN chmod +x bin/geneweb-launch.sh \
+ && touch log/gwsetup.log \
+ && touch log/gwd.log \
+ && chown -R geneweb:geneweb .
 
-# setup opam
-RUN opam -y init --compiler=${OCAML_VER} \
- && eval $(opam env) \
- && opam install -y \
-         calendars.1.0.0 \
-         camlp-streams \
-         camlp5 \
-         cppo \
-         dune \
-         jingoo \
-         markup \
-         oUnit \
-         ppx_blob \
-         ppx_deriving \
-         ppx_import \
-         stdlib-shims \
-         syslog \
-         unidecode.0.2.0 \
-         uri \
-         uucp \
-         uutf \
-         uunf \
- && opam exec -- ocaml --version \
- && opam exec -- opam --version \
- && opam list
+# Switch to geneweb user
+USER geneweb
 
-RUN --mount=type=cache,target=/tmp/build/,sharing=locked \
-    cd /tmp/build/ \
- && (test -e /tmp/build/geneweb/.git || git clone --depth=1 --no-single-branch https://github.com/geneweb/geneweb /tmp/build/geneweb) \
- && cd /tmp/build/geneweb \
- && ls -l \
- && git checkout ${GW_VER} \
- && eval $(opam env) \
- && opam exec -- ocaml ./configure.ml --release \
- && opam exec -- make distrib \
- && rsync -azv /tmp/build/geneweb/distribution/ /opt/geneweb/
-
-COPY opt/geneweb/startup.sh ${GW_ROOT}
-COPY opt/geneweb/bashrc ${GW_ROOT}/.bashrc
-
-RUN chown -cR ${GW_USER}:${GW_GROUP} ${GW_ROOT} \
- && chmod -c +x ${GW_ROOT}/startup.sh
-
-USER ${GW_USER}
-WORKDIR ${GW_ROOT}
-
-ENV PATH="${GW_ROOT}:${GW_ROOT}:${PATH}"
-
-RUN ${GW_ROOT}/gw --version
+# Configure container
 
 EXPOSE ${GWD_PORT} \
        ${GWC_PORT} \
        ${HTTP_PORT} \
        ${HTTPS_PORT}
+
+VOLUME [ "${GENEWEB_DATA_PATH}", "${GENEWEB_HOME}/etc" ]
 
 HEALTHCHECK --interval=5m \
             --timeout=3s \
